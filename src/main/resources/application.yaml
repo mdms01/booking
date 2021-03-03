@@ -1,0 +1,16 @@
+app:
+    services:
+        clinics:
+            url: ${CLINICS_SERVICE_URL:https://}
+            apiKey: ${CLINICS_SERVICE_API_KEY:123}
+        customer:
+            url: ${CUSTOMER_SERVICE_URL:https://}
+            apiKey: ${CUSTOMER_SERVICE_API_KEY:123}
+spring:
+    datasource:
+        url: jdbc:h2:mem:booking
+        driverClassName: org.h2.Driver
+        username: sa
+        password: password
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
