@@ -91,10 +91,17 @@ workflows:
   deployment:
     jobs:
       - build
+      - aws-eks/create-cluster:
+          cluster-name: booking-cluster
+      - test-cluster:
+          cluster-name: my-eks-demo
+          requires:
+            - aws-eks/create-cluster
       - create-deployment:
           cluster-name: booking-cluster
           requires:
             - build
+            - aws-eks/create-cluster
       - aws-eks/update-container-image:
           cluster-name: eks-demo-deployment
           container-image-updates: 'booking=316826375590.dkr.ecr.eu-west-1.amazonaws.com/therapie:latest'
