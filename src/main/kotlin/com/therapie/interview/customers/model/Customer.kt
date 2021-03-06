@@ -1,3 +1,3 @@
-package com.therapie.interview.customer.model
+package com.therapie.interview.customers.model
 
 data class Customer(val id: String)

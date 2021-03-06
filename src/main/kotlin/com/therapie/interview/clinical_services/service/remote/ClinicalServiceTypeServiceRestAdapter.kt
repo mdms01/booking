@@ -1,16 +1,27 @@
-package com.therapie.interview.services.service.remote
+package com.therapie.interview.clinical_services.service.remote
 
-import com.therapie.interview.services.model.ClinicalService
-import com.therapie.interview.services.service.ClinicalServiceTypeService
-import java.math.BigDecimal
 
-@org.springframework.stereotype.Service
-class ClinicalServiceTypeServiceRestAdapter : ClinicalServiceTypeService {
-    override fun retrieveAll(): List<ClinicalService> {
-        TODO("Not yet implemented")
-    }
+import com.therapie.interview.clinical_services.model.ClinicalService
+import com.therapie.interview.clinical_services.service.ClinicalServiceTypeService
+import com.therapie.interview.common.exceptions.NotFoundExeception
+import feign.FeignException
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Service
+
+@Service
+class ClinicalServiceTypeServiceRestAdapter (val clinicalServicesRestClient: ClinicalServicesRestClient): ClinicalServiceTypeService {
+
+    @Value("\${app.services.clinics.apiKey}")
+    lateinit var apiKey:String
 
     override fun retrieveById(serviceId: String): ClinicalService {
-        return ClinicalService(serviceId, "mock", BigDecimal.TEN, 30)
+        try {
+            return clinicalServicesRestClient.retrieveById(serviceId, apiKey)
+        } catch (exception:FeignException.NotFound){
+            throw NotFoundExeception("error.clinical_service.not_found",
+                    "Clinical service $serviceId not found",
+                    mapOf("objectId" to serviceId))
+        }
     }
+
 }

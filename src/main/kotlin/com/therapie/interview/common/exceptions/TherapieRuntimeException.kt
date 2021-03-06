@@ -1,4 +1,5 @@
 package com.therapie.interview.common.exceptions
 
-class TherapieRuntimeException(message: String?) : RuntimeException(message) {
-}
+open class TherapieRuntimeException(val code:String,
+                                    message: String?,
+                                    val parameters:Map<String,Any> = HashMap() ) : RuntimeException(message)

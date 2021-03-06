@@ -1,3 +1,5 @@
 package com.therapie.interview.clinics.model
 
-data class Clinic (val id:String)
+import java.io.Serializable
+
+data class Clinic(val id: String): Serializable

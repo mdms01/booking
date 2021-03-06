@@ -1,8 +1,7 @@
-package com.therapie.interview.customer.service
+package com.therapie.interview.customers.service
 
-import com.therapie.interview.customer.model.Customer
+import com.therapie.interview.customers.model.Customer
 
 interface CustomerService {
-    fun retrieveAllCustomers(): List<Customer>
     fun retrieveCustomer(customerId: String): Customer
 }

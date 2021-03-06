@@ -1,8 +1,7 @@
-package com.therapie.interview.services.service
+package com.therapie.interview.clinical_services.service
 
-import com.therapie.interview.services.model.ClinicalService
+import com.therapie.interview.clinical_services.model.ClinicalService
 
 interface ClinicalServiceTypeService {
-    fun retrieveAll(): List<ClinicalService>
     fun retrieveById(serviceId: String): ClinicalService
 }
