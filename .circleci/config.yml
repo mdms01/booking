@@ -94,7 +94,7 @@ workflows:
       - build
       - test-cluster:
           cluster-name: booking-cluster
-          aws-region: eu-west-1
+
       - create-deployment:
           cluster-name: booking-cluster
           requires:
