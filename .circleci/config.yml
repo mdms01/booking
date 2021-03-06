@@ -101,6 +101,7 @@ workflows:
             - build
       - aws-eks/update-container-image:
           cluster-name: booking-cluster
+          aws-region: eu-west-1
           container-image-updates: 'booking=316826375590.dkr.ecr.eu-west-1.amazonaws.com/therapie:latest'
           post-steps:
             - kubernetes/delete-resource:
