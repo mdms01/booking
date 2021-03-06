@@ -95,7 +95,7 @@ workflows:
             - build
       - aws-eks/update-container-image:
           cluster-name: eks-demo-deployment
-          container-image-updates: '316826375590.dkr.ecr.eu-west-1.amazonaws.com/therapie:latest'
+          container-image-updates: 'booking=316826375590.dkr.ecr.eu-west-1.amazonaws.com/therapie:latest'
           post-steps:
             - kubernetes/delete-resource:
                 resource-names: deployment/booking-deployment
@@ -104,6 +104,6 @@ workflows:
           record: true
           requires:
             - create-deployment
-          resource-name: deployment/nginx-deployment
+          resource-name: deployment/booking-deployment
 
 
