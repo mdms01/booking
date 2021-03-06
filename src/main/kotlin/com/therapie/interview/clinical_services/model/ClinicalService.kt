@@ -1,4 +1,4 @@
-package com.therapie.interview.services.model
+package com.therapie.interview.clinical_services.model
 
 import java.math.BigDecimal
 import java.time.LocalTime

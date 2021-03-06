@@ -5,12 +5,12 @@ import com.therapie.interview.services.service.ClinicalServiceTypeService
 import java.math.BigDecimal
 
 @org.springframework.stereotype.Service
-class ClinicalServiceTypeServiceRestAdapter:ClinicalServiceTypeService {
+class ClinicalServiceTypeServiceRestAdapter : ClinicalServiceTypeService {
     override fun retrieveAll(): List<ClinicalService> {
         TODO("Not yet implemented")
     }
 
     override fun retrieveById(serviceId: String): ClinicalService {
-        return ClinicalService(serviceId,"mock", BigDecimal.TEN,30)
+        return ClinicalService(serviceId, "mock", BigDecimal.TEN, 30)
     }
 }
