@@ -44,7 +44,12 @@ jobs:
       - run: gradle build
       - store_test_results:
             path: build/test-results/test
+workflows:
+  build_and_push_image:
+    jobs:
       - aws-ecr/build-and-push-image:
+          requires:
+              - build
           account-url: AWS_ECR_ACCOUNT_URL
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
