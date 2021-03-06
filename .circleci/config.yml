@@ -93,6 +93,7 @@ workflows:
       - build
       - aws-eks/create-cluster:
           cluster-name: booking-cluster
+          aws-region: eu-west-1
       - test-cluster:
           cluster-name: my-eks-demo
           requires:
