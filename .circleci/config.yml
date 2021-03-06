@@ -5,6 +5,8 @@
 version: 2.1
 orbs:
   aws-ecr: circleci/aws-ecr@6.7.0
+  aws-ecs: circleci/aws-ecs@0.0.11
+
 jobs:
   build:
     docker:
@@ -25,40 +27,28 @@ jobs:
 
     steps:
       - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle.kts" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
-      - run: gradle dependencies
-
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle.kts" }}
+      - setup_remote_docker
+      - run:
+        name: Setup common environment variables
+        command: |
+          echo 'export ECR_REPOSITORY_NAME="${AWS_RESOURCE_NAME_PREFIX}"' >> $BASH_ENV
+          echo 'export FULL_IMAGE_NAME="${AWS_ECR_ACCOUNT_URL}:$CIRCLE_SHA1"' >> $BASH_ENV
+      - run:
+          name: Install dependencies for AWS
+          command: |
+            sudo apt-get update
+            sudo apt-get -y -qq install awscli
+            sudo apt-get install python3-pip
+            sudo pip3 install --upgrade awscli
 
       # run tests!
       - run: gradle build
-      - store_test_results:
-            path: build/test-results/test
-      - attach_workspace:
-          at: build
-workflows:
-  build_and_push_image:
-    jobs:
-      - build
-      - aws-ecr/build-and-push-image:
-          requires:
-              - build
-          account-url: AWS_ECR_ACCOUNT_URL
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-          create-repo: true
-          dockerfile: Dockerfile
-          path: .
-          region: AWS_REGION
-          repo: therapie
-          tag: "$CIRCLE_SHA1"
+      - run:
+          name: Build image
+          command: |
+            docker build -t $FULL_IMAGE_NAME .
+      - run:
+          name: Push image
+          command: |
+            eval $(aws ecr get-login --region $AWS_REGION --no-include-email)
+            docker push $FULL_IMAGE_NAME
