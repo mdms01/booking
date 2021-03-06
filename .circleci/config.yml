@@ -6,6 +6,8 @@ version: 2.1
 orbs:
   aws-ecr: circleci/aws-ecr@6.7.0
   aws-ecs: circleci/aws-ecs@0.0.11
+  aws-eks: circleci/aws-eks@1.0.3
+  kubernetes: circleci/kubernetes@0.4.0
 
 jobs:
   build:
@@ -32,7 +34,7 @@ jobs:
           name: Setup common environment variables
           command: |
             echo 'export ECR_REPOSITORY_NAME="${AWS_RESOURCE_NAME_PREFIX}"' >> $BASH_ENV
-            echo 'export FULL_IMAGE_NAME="${AWS_ECR_ACCOUNT_URL}:$CIRCLE_SHA1"' >> $BASH_ENV
+            echo 'export FULL_IMAGE_NAME="${AWS_ECR_ACCOUNT_URL}:latest"' >> $BASH_ENV
       - run:
           name: Install dependencies for AWS
           command: |
@@ -52,3 +54,58 @@ jobs:
           command: |
             eval $(aws ecr get-login --region $AWS_REGION --no-include-email)
             docker push $FULL_IMAGE_NAME
+  test-cluster:
+    executor: aws-eks/python3
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - kubernetes/install
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: << parameters.cluster-name >>
+      - run:
+          command: |
+            kubectl get services
+          name: Main cluster
+  create-deployment:
+    executor: aws-eks/python3
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - checkout
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: << parameters.cluster-name >>
+          install-kubectl: true
+      - kubernetes/create-or-update-resource:
+          get-rollout-status: true
+          resource-file-path: cicd/k8s/booking/deployment.yaml
+          resource-name: deployment/booking-deployment
+workflows:
+  deployment:
+    jobs:
+      - build
+      - aws-eks/create-cluster:
+          cluster-name: booking-cluster
+      - create-deployment:
+          cluster-name: booking-cluster
+          requires:
+            - aws-eks/create-cluster
+      - aws-eks/update-container-image:
+          cluster-name: eks-demo-deployment
+          container-image-updates: 'nginx=nginx:1.9.1'
+          post-steps:
+            - kubernetes/delete-resource:
+                resource-names: nginx-deployment
+                resource-types: deployment
+                wait: true
+          record: true
+          requires:
+            - create-deployment
+          resource-name: deployment/nginx-deployment
+
+
