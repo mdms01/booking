@@ -89,18 +89,17 @@ workflows:
   deployment:
     jobs:
       - build
-      - aws-eks/create-cluster:
-          cluster-name: booking-cluster
       - create-deployment:
           cluster-name: booking-cluster
           requires:
+            - build
             - aws-eks/create-cluster
       - aws-eks/update-container-image:
           cluster-name: eks-demo-deployment
-          container-image-updates: 'nginx=nginx:1.9.1'
+          container-image-updates: '316826375590.dkr.ecr.eu-west-1.amazonaws.com/therapie:latest'
           post-steps:
             - kubernetes/delete-resource:
-                resource-names: nginx-deployment
+                resource-names: deployment/booking-deployment
                 resource-types: deployment
                 wait: true
           record: true
