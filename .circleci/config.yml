@@ -5,8 +5,8 @@
 version: 2.1
 orbs:
   aws-ecr: circleci/aws-ecr@6.7.0
-workflows:
-  jobs:
+jobs:
+  build:
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:11-jdk
@@ -44,6 +44,10 @@ workflows:
       - run: gradle test
       - store_test_results:
             path: build/test-results/test
+workflows:
+  build_and_push_image:
+    jobs:
+      - build
       - aws-ecr/build-and-push-image:
           account-url: AWS_ECR_ACCOUNT_URL
           aws-access-key-id: AWS_ACCESS_KEY_ID
