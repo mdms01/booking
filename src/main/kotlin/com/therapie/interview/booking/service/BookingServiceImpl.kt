@@ -1,20 +1,16 @@
 package com.therapie.interview.booking.service
 
-import com.therapie.interview.booking.exception.TimeSlotException
 import com.therapie.interview.booking.model.dto.Booking
 import com.therapie.interview.booking.model.dto.BookingRequest
 import com.therapie.interview.booking.model.entity.BookingEntity
 import com.therapie.interview.booking.repository.BookingRepository
-
-import com.therapie.interview.clinics.model.TimeRange
+import com.therapie.interview.clinical_services.service.ClinicalServiceTypeService
+import com.therapie.interview.clinics.model.TimeSlot
 import com.therapie.interview.clinics.service.ClinicService
 import com.therapie.interview.customers.service.CustomerService
-import com.therapie.interview.clinical_services.model.ClinicalService
-import com.therapie.interview.clinical_services.service.ClinicalServiceTypeService
 import mu.KLogging
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -24,11 +20,8 @@ class BookingServiceImpl(
         val customerService: CustomerService,
         val clinicalServiceTypeService: ClinicalServiceTypeService,
         val bookingRepository: BookingRepository) : BookingService {
-    companion object: KLogging() {
-        const val SIXTY_SECONDS = 60
-    }
+    companion object : KLogging()
 
-    @Transactional
     @Cacheable(value = ["bookings"],
             key = "#bookingRequest.clinicId + '-' + #bookingRequest.serviceId + '-' + #bookingRequest.customerId + '-' + #bookingRequest.date.toString() + '-' + #bookingRequest.startTime.toString() + '-' + #bookingRequest.idempotentKey",
             condition = "#bookingRequest.idempotentKey != null"
@@ -38,59 +31,46 @@ class BookingServiceImpl(
         val booking = bookingRequest.toEntity()
         saveBooking(booking)
         return booking.toDto()
-
     }
 
     override fun retrieveBookingsByClinic(clinicId: String): List<Booking> {
-        clinicService.retrieveClinicById(clinicId)
+        checkClinic(clinicId)
         return bookingRepository.findByClinic(clinicId).map { it.toDto() }
     }
 
-    override fun retrieveFreeTimeSlots(clinicId: String, serviceId: String, date: LocalDate): List<TimeRange> {
-        TODO("Not yet implemented")
+    override fun retrieveFreeTimeSlots(clinicId: String, serviceId: String, date: LocalDate): List<LocalTime> {
+        checkClinic(clinicId)
+        val clinicalServiceType = clinicalServiceTypeService.retrieveById(serviceId)
+        val bookableTimeSlots = clinicService.retrieveBookableTimeSlots(clinicId, serviceId, date, clinicalServiceType.durationInMunites)
+        val bookedTimes = bookingRepository.findByClinicAndServiceAndDate(clinicId, serviceId, date).map { it.startTime }.toSet()
+        return bookableTimeSlots.filterNot { bookedTimes.contains(it) }
+
     }
 
     private fun validateBookingRequest(bookingRequest: BookingRequest) {
-        checkClinic(bookingRequest)
+        checkClinic(bookingRequest.clinicId)
         checkCustomer(bookingRequest)
         val clinicalServiceType = clinicalServiceTypeService.retrieveById(bookingRequest.serviceId)
-        val timeSlot = retrieveTimeSlot(bookingRequest, clinicalServiceType)
-        checkIfBookingRequestMatchesStartTimeSlots(bookingRequest, timeSlot, clinicalServiceType)
+        val timeSlot = bookingRequest.toTimeSlot(clinicalServiceType.durationInMunites.toLong())
+        clinicService.checkTimeSlotIsValid(timeSlot)
     }
 
     private fun checkCustomer(bookingRequest: BookingRequest) {
         customerService.retrieveCustomer(bookingRequest.customerId)
     }
 
-    private fun checkClinic(bookingRequest: BookingRequest) {
-        clinicService.retrieveClinicById(bookingRequest.clinicId)
+    private fun checkClinic(clinicId: String) {
+        clinicService.retrieveClinicById(clinicId)
     }
-
-    private fun checkIfBookingRequestMatchesStartTimeSlots(bookingRequest: BookingRequest, timeSlot: TimeRange, clinicalServiceType: ClinicalService) {
-        val serviceDurationInSeconds = clinicalServiceType.durationInMunites * SIXTY_SECONDS
-        val timeDifferenceInSeconds = (bookingRequest.startTime - timeSlot.startTime).toSecondOfDay()
-        if ((timeDifferenceInSeconds % serviceDurationInSeconds) != 0) {
-            val previousTimeSlot = timeSlot.startTime.plusSeconds((timeDifferenceInSeconds / serviceDurationInSeconds).toLong() * serviceDurationInSeconds)
-            throw TimeSlotException("error.time_slot.wrong_start_time", "There is no option to book the service at ${bookingRequest.startTime} the previous slot is $previousTimeSlot", mapOf("lastSlot" to previousTimeSlot));
-        }
-    }
-
 
     private fun saveBooking(bookingEntity: BookingEntity) {
         bookingRepository.insert(bookingEntity.clinicId, bookingEntity.serviceId, bookingEntity.date, bookingEntity.startTime, bookingEntity.customerId)
     }
 
-    private fun retrieveTimeSlot(bookingRequest: BookingRequest, clinicalServiceType: ClinicalService): TimeRange {
-        val bookingEndTime = clinicalServiceType.calculateFinishTime(bookingRequest.startTime)
-
-        return clinicService.retrieveTimeSlotForTimeInterval(bookingRequest.clinicId,
-                bookingRequest.serviceId, bookingRequest.date, bookingRequest.startTime, bookingEndTime)
-    }
-
 }
 
-private operator fun LocalTime.minus(startTime: LocalTime): LocalTime =
-        LocalTime.ofNanoOfDay(this.toNanoOfDay() - startTime.toNanoOfDay())
+private fun BookingRequest.toTimeSlot(durationInMinutes: Long): TimeSlot =
+        TimeSlot(clinicId, serviceId, date, startTime, durationInMinutes)
 
 private fun BookingRequest.toEntity(): BookingEntity =
         BookingEntity(clinicId, serviceId, date, startTime, customerId)

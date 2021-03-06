@@ -1,19 +1,18 @@
 package com.therapie.interview.booking.exception.handler
 
-import com.therapie.interview.booking.exception.TimeSlotException
-
 import com.therapie.interview.booking.model.dto.ErrorInformation
+import com.therapie.interview.clinics.exception.TimeSlotException
 import com.therapie.interview.common.exceptions.NotFoundExeception
 import com.therapie.interview.common.exceptions.TherapieRuntimeException
 import feign.RetryableException
 import mu.KLogging
-
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 
 
 @ControllerAdvice(basePackages = ["com.therapie.interview.booking.controller"])
@@ -32,7 +31,15 @@ class ControllerErrorHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
-    fun handleUnexpectedDataStructure(exception: HttpMessageNotReadableException): ResponseEntity<ErrorInformation> {
+    fun handleUnexpectedDataStructure(exception: HttpMessageNotReadableException) =
+            handleGenericDataStructureException(exception)
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+    fun handleUnexpectedDataStructure(exception: MethodArgumentTypeMismatchException) =
+            handleGenericDataStructureException(exception)
+
+
+    fun handleGenericDataStructureException(exception: Exception): ResponseEntity<ErrorInformation> {
         val errorInformation = ErrorInformation("error.client.wrong_structure",
                 "Request doesn't contain the expected structure")
 
@@ -42,6 +49,7 @@ class ControllerErrorHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(errorInformation)
     }
+
 
     @ExceptionHandler(RetryableException::class)
     fun handleCommunicationError(exception: RetryableException): ResponseEntity<ErrorInformation> {

@@ -46,7 +46,8 @@ Booking system uses Clinics and customers system to validate customers bookings,
 * Store at GMT +0
 * As the concurrency in the booking is hard, a trade off must be put in place, compromisse the schedule flexibility with guaranteed no double bookings
 * Caching for Services and clinic timeslots are mandatory to prevent complications on booking
-* Use relational database due query capabilities even the book looks like a key value pair 
+* Use relational database due query capabilities even the book looks like a key value pair
+* no impose restrictions when the user can schedule 
 
 #REST API 
 #### Concerns

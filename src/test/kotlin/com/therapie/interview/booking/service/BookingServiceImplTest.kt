@@ -6,7 +6,6 @@ import com.therapie.interview.clinical_services.service.ClinicalServiceTypeServi
 import com.therapie.interview.customers.service.CustomerService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -63,7 +62,6 @@ internal class BookingServiceImplTest {
         `when`(clinicalServiceTypeService.retrieveById(anyString())).thenReturn(ClinicalService(serviceId,"234", BigDecimal.TEN,30))*/
         //`when`(bookingRepository.insert(anyString(),anyString(),any(), anyString())).then.thenThrow(DataIntegrityViolationException(""))
         val idempotentKey1 = UUID.randomUUID().toString()
-
 
 
         val bookingRequest = BookingRequest("c123", clinicId, serviceId, date, startTime, idempotentKey1)

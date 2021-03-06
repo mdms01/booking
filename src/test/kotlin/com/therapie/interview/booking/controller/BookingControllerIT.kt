@@ -14,8 +14,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.web.WebAppConfiguration
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.ResultMatcher
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -32,6 +32,7 @@ internal class BookingControllerIT : BaseTest() {
         const val IDEMPOTENT_KEY_HEADER_NAME = "x-idempotent-key"
         const val BOOKING_URI = "/bookings"
         const val BOOKINGS_FOR_A_CLINIC_URI = "/clinic/{clinicId}/bookings"
+        const val TIME_AVALIABLE_URI = "/clinic/{clinicId}/services/{serviceId}/bookings/available/{date}"
     }
 
 
@@ -62,7 +63,7 @@ internal class BookingControllerIT : BaseTest() {
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
         val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 31, 0))
-        book(bookingRequest, idempotentKey,status().isBadRequest)
+        book(bookingRequest, idempotentKey, status().isBadRequest)
     }
 
     @Test
@@ -120,7 +121,7 @@ internal class BookingControllerIT : BaseTest() {
 
     @Test
     fun `book - wrong structure`() {
-        postRequest(BOOKING_URI,"{wrong structure}",null ).andExpect(status().isBadRequest)
+        postRequest(BOOKING_URI, "{wrong structure}", null).andExpect(status().isBadRequest)
     }
 
     @Test
@@ -129,7 +130,7 @@ internal class BookingControllerIT : BaseTest() {
         val serviceId = "23423"
         val clinicId = "c122"
 
-        mockClinicNotFoundError()
+        mockClinicToRaiseNotFoundError()
         mockClinicalService(serviceId)
         mockCustomer(customerId)
         mockTimeSlots(2)
@@ -144,7 +145,7 @@ internal class BookingControllerIT : BaseTest() {
         val serviceId = "23423"
         val clinicId = "c122"
 
-        mockClinicCommunicationError()
+        mockClinicToRaiseCommunicationError()
         mockClinicalService(serviceId)
         mockCustomer(customerId)
         mockTimeSlots(2)
@@ -161,12 +162,44 @@ internal class BookingControllerIT : BaseTest() {
 
         mockClinic(clinicId)
         mockCustomer(customerId)
-        mockClinicalServiceNotFound()
+        mockClinicalServiceToRaiseNotFound()
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
         val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
         book(bookingRequest, idempotentKey, status().isNotFound)
 
+    }
+
+    @Test
+    fun `book - time slots doesnt exists`() {
+        val customerId = "123"
+        val serviceId = "23423"
+        val clinicId = "c121"
+
+        mockClinic(clinicId)
+        mockCustomer(customerId)
+        mockClinicalService(serviceId)
+        mockTimeSlotToRaiseNotFoundError()
+        val idempotentKey = UUID.randomUUID().toString()
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+
+        book(bookingRequest, idempotentKey, status().isNotFound)
+    }
+
+    @Test
+    fun `book - time slots for a date are empty`() {
+        val customerId = "123"
+        val serviceId = "23423"
+        val clinicId = "c121"
+
+        mockClinic(clinicId)
+        mockCustomer(customerId)
+        mockClinicalService(serviceId)
+        mockEmptyTimeSlots()
+        val idempotentKey = UUID.randomUUID().toString()
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+
+        book(bookingRequest, idempotentKey, status().isBadRequest)
     }
 
     @Test
@@ -177,7 +210,7 @@ internal class BookingControllerIT : BaseTest() {
 
         mockClinic(clinicId)
         mockCustomer(customerId)
-        mockClinicalServiceCommunicationError()
+        mockClinicalServiceToRaiseCommunicationError()
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
         val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
@@ -192,7 +225,7 @@ internal class BookingControllerIT : BaseTest() {
         val clinicId = "c121"
 
         mockClinic(clinicId)
-        mockCustomerNotFoundError()
+        mockCustomerToRaiseNotFoundError()
         mockClinicalService(serviceId)
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
@@ -208,7 +241,7 @@ internal class BookingControllerIT : BaseTest() {
         val clinicId = "c121"
 
         mockClinic(clinicId)
-        mockCustomerCommunicationError()
+        mockCustomerToRaiseCommunicationError()
         mockClinicalService(serviceId)
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
@@ -226,7 +259,7 @@ internal class BookingControllerIT : BaseTest() {
         mockClinic(clinicId)
         mockCustomer(customerId)
         mockClinicalService(serviceId)
-        mockTimeSlotNotFoundError()
+        mockTimeSlotToRaiseNotFoundError()
         val idempotentKey = UUID.randomUUID().toString()
         val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
         book(bookingRequest, idempotentKey, status().isNotFound)
@@ -241,7 +274,7 @@ internal class BookingControllerIT : BaseTest() {
         mockClinic(clinicId)
         mockCustomer(customerId)
         mockClinicalService(serviceId)
-        mockTimeSlotCommunicationError()
+        mockTimeSlotToRaiseCommunicationError()
         val idempotentKey = UUID.randomUUID().toString()
         val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
         book(bookingRequest, idempotentKey, status().isServiceUnavailable)
@@ -260,9 +293,9 @@ internal class BookingControllerIT : BaseTest() {
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
         val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
-        bookSuccessfully(bookingRequest,idempotentKey)
+        bookSuccessfully(bookingRequest, idempotentKey)
 
-        getRequest(BOOKINGS_FOR_A_CLINIC_URI,clinicId)
+        getRequest(BOOKINGS_FOR_A_CLINIC_URI, clinicId)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("[0].clinicId", Matchers.`is`(clinicId)))
     }
@@ -278,23 +311,74 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockTimeSlots(2)
 
-        var startTime = LocalTime.of(9, 30, 0)
-        (0..10).forEach{ _ ->
+        var startTime = LocalTime.of(8, 0, 0)
+        (0..5).forEach { _ ->
             val idempotentKey = UUID.randomUUID().toString()
             val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), startTime)
             startTime = startTime.plusMinutes(30)
             bookSuccessfully(bookingRequest, idempotentKey)
         }
-        getRequest(BOOKINGS_FOR_A_CLINIC_URI,clinicId)
+        getRequest(BOOKINGS_FOR_A_CLINIC_URI, clinicId)
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("*", Matchers.hasSize<Any>(11)))
+                .andExpect(jsonPath("*", Matchers.hasSize<Any>(6)))
     }
 
     @Test
-    fun `retrieveBookingsForAClinic - no bookings `() {
+    fun `book - unavailable slot`() {
+        val customerId = "123"
+        val serviceId = "23423"
+        val clinicId = "c1207"
+
+        mockClinic(clinicId)
+        mockCustomer(customerId)
+        mockClinicalService(serviceId)
+        mockTimeSlots(2)
+
+        var startTime = LocalTime.of(12, 0, 0)
+        val idempotentKey = UUID.randomUUID().toString()
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), startTime)
+        book(bookingRequest, idempotentKey, status().isBadRequest)
+    }
+
+    @Test
+    fun `book - unexpected exception`() {
+        val customerId = "123"
+        val serviceId = "23423"
+        val clinicId = "c1207"
+
+        mockClinic(clinicId)
+        mockCustomer(customerId)
+        mockClinicalService(serviceId)
+        mockTimeSlotToRaiseRuntimeException()
+
+        var startTime = LocalTime.of(12, 0, 0)
+        val idempotentKey = UUID.randomUUID().toString()
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), startTime)
+        book(bookingRequest, idempotentKey, status().isInternalServerError)
+    }
+
+    @Test
+    fun `book - generic exception`() {
+        val customerId = "123"
+        val serviceId = "23423"
+        val clinicId = "c1207"
+
+        mockClinic(clinicId)
+        mockCustomer(customerId)
+        mockClinicalService(serviceId)
+        mockTimeSlotToRaiseTherapieException()
+
+        var startTime = LocalTime.of(12, 0, 0)
+        val idempotentKey = UUID.randomUUID().toString()
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), startTime)
+        book(bookingRequest, idempotentKey, status().isBadRequest)
+    }
+
+    @Test
+    fun `retrieve bookings - no bookings `() {
         val clinicId = "c1204"
         mockClinic(clinicId)
-        getRequest(BOOKINGS_FOR_A_CLINIC_URI,clinicId)
+        getRequest(BOOKINGS_FOR_A_CLINIC_URI, clinicId)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("*", Matchers.hasSize<Any>(0)))
     }
@@ -302,11 +386,58 @@ internal class BookingControllerIT : BaseTest() {
     @Test
     fun `retrieve bookings - no clinic`() {
         val clinicId = "c120"
-        mockClinicNotFoundError()
+        mockClinicToRaiseNotFoundError()
         getRequest(BOOKINGS_FOR_A_CLINIC_URI, clinicId)
                 .andExpect(status().isNotFound)
 
     }
+
+    @Test
+    fun `retrieve avaliable - no bookings`() {
+        val customerId = "123"
+        val serviceId = "23423"
+        val clinicId = "c1201"
+
+        mockClinic(clinicId)
+        mockCustomer(customerId)
+        mockClinicalService(serviceId)
+        mockTimeSlots(1)
+        getRequest(TIME_AVALIABLE_URI, clinicId, serviceId, LocalDate.of(2021, 3, 4))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("*", Matchers.hasSize<Any>(16)))
+
+    }
+
+    @Test
+    fun `retrieve avaliable - invalid path parameter`() {
+        val serviceId = "23423"
+        val clinicId = "c1201"
+        getRequest(TIME_AVALIABLE_URI, clinicId, serviceId, "invalidDate")
+                .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun `retrieve avaliable - one booking`() {
+        val customerId = "123"
+        val serviceId = "23423"
+        val clinicId = "c1202"
+
+        mockClinic(clinicId)
+        mockCustomer(customerId)
+        mockClinicalService(serviceId)
+        mockTimeSlots(1)
+        val idempotentKey = UUID.randomUUID().toString()
+        val startTime = LocalTime.of(9, 30, 0)
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), startTime)
+        bookSuccessfully(bookingRequest, idempotentKey)
+
+        getRequest(TIME_AVALIABLE_URI, clinicId, serviceId, LocalDate.of(2021, 3, 4))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("*", Matchers.hasSize<Any>(15)))
+                .andExpect(jsonPath("*", Matchers.not(Matchers.containsInAnyOrder(startTime))))
+
+    }
+
 
     private fun bookSuccessfully(bookingRequest: BookingRequest, idempotentKey: String) {
         book(bookingRequest, idempotentKey, status().isOk)
@@ -318,8 +449,8 @@ internal class BookingControllerIT : BaseTest() {
     }
 
 
-    private fun postRequest(urlTemplate: String, body: Any, idempotentKey: String?,vararg parameters:Any): ResultActions {
-        var request = post(urlTemplate,*parameters).characterEncoding("UTF-8")
+    private fun postRequest(urlTemplate: String, body: Any, idempotentKey: String?, vararg parameters: Any): ResultActions {
+        var request = post(urlTemplate, *parameters).characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(body))
 
@@ -328,8 +459,8 @@ internal class BookingControllerIT : BaseTest() {
         return mockMvc.perform(request).andDo(print())
     }
 
-    private fun getRequest(urlTemplate: String, vararg parameters:Any): ResultActions {
-        var request = get(urlTemplate,*parameters).characterEncoding("UTF-8")
+    private fun getRequest(urlTemplate: String, vararg parameters: Any): ResultActions {
+        var request = get(urlTemplate, *parameters).characterEncoding("UTF-8")
 
         return mockMvc.perform(request).andDo(print())
     }

@@ -5,7 +5,6 @@ import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurerSupport
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Conditional
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager
@@ -17,8 +16,8 @@ import java.time.Duration
 
 @Configuration
 //@Conditional()
-@EnableConfigurationProperties(value = [CacheConfigurationProperties::class],)
-class CacheConfiguration () : CachingConfigurerSupport() {
+@EnableConfigurationProperties(value = [CacheConfigurationProperties::class])
+class CacheConfiguration() : CachingConfigurerSupport() {
 
     fun createCacheConfiguration(timeoutInSeconds: Long): RedisCacheConfiguration {
         return RedisCacheConfiguration.defaultCacheConfig()
@@ -46,7 +45,7 @@ class CacheConfiguration () : CachingConfigurerSupport() {
     }
 
     @Bean
-    fun cacheManager( properties: CacheConfigurationProperties): CacheManager {
+    fun cacheManager(properties: CacheConfigurationProperties): CacheManager {
         if (properties.type == CacheType.REDIS) {
             val redisConnectionFactory = redisConnectionFactory(properties)
             val cacheConfigurations = HashMap<String, RedisCacheConfiguration>();

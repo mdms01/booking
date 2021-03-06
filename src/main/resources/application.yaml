@@ -1,41 +1,41 @@
 debug: true
 app:
+  services:
+    clinics:
+      url: ${CLINICS_SERVICE_URL:http://localhost}
+      apiKey: ${CLINICS_SERVICE_API_KEY:123}
     services:
-        clinics:
-            url: ${CLINICS_SERVICE_URL:http://localhost}
-            apiKey: ${CLINICS_SERVICE_API_KEY:123}
-        services:
-            url: ${CLINICS_SERVICE_URL:http://localhost}
-            apiKey: ${CLINICS_SERVICE_API_KEY:123}
-        customer:
-            url: ${CUSTOMER_SERVICE_URL:http://localhost}
-            apiKey: ${CUSTOMER_SERVICE_API_KEY:123}
+      url: ${CLINICS_SERVICE_URL:http://localhost}
+      apiKey: ${CLINICS_SERVICE_API_KEY:123}
+    customer:
+      url: ${CUSTOMER_SERVICE_URL:http://localhost}
+      apiKey: ${CUSTOMER_SERVICE_API_KEY:123}
 cache:
-    timeoutInSeconds: ${DEFAULT_CACHE_TIMEOUT:5000000}
-    redisPort: ${REDIS_PORT:6379}
-    redisHost: ${REDIS_HOST:localhost}
-    type: REDIS
-    configs:
-        bookings:
-            enabled: true
-        clinics:
-            enabled: true
-        clinics_time_slots:
-            enabled: true
-            expirationInSeconds: 5000
-        clinical_services:
-            enabled: true
+  timeoutInSeconds: ${DEFAULT_CACHE_TIMEOUT:5000000}
+  redisPort: ${REDIS_PORT:6379}
+  redisHost: ${REDIS_HOST:localhost}
+  type: REDIS
+  configs:
+    bookings:
+      enabled: true
+    clinics:
+      enabled: true
+    clinics_time_slots:
+      enabled: true
+      expirationInSeconds: 5000
+    clinical_services:
+      enabled: true
 
 spring:
-    datasource:
-        url: jdbc:h2:mem:booking
-        driverClassName: org.h2.Driver
-        username: sa
-        password: password
-    jpa:
-        database-platform: org.hibernate.dialect.H2Dialect
+  datasource:
+    url: jdbc:h2:mem:booking
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
 
 server:
-    port: 9000
-    servlet:
-        contextPath: /
+  port: 9000
+  servlet:
+    contextPath: /

@@ -6,6 +6,7 @@ import com.therapie.interview.clinical_services.service.remote.ClinicalServicesR
 import com.therapie.interview.clinics.model.Clinic
 import com.therapie.interview.clinics.model.TimeRange
 import com.therapie.interview.clinics.service.remote.ClinicRestClient
+import com.therapie.interview.common.exceptions.TherapieRuntimeException
 import com.therapie.interview.customers.model.Customer
 import com.therapie.interview.customers.service.remote.CustomerRestClient
 import feign.FeignException
@@ -54,6 +55,10 @@ open class BaseTest {
         mockClinicalServicesTimeSlots(timeSlots)
     }
 
+    protected fun mockEmptyTimeSlots() {
+        mockClinicalServicesTimeSlots(emptyList())
+    }
+
     private fun buildTimeSlots(amount: Int, startTime: LocalTime, sizeInMinutes: Int, intervalInMinutes: Int): List<TimeRange> {
         var currentTime = startTime
         return (0..amount).map {
@@ -61,6 +66,22 @@ open class BaseTest {
             currentTime = currentTime.plusMinutes(sizeInMinutes.toLong() + intervalInMinutes.toLong())
             time
         }
+    }
+
+    protected fun mockTimeSlotToRaiseRuntimeException() {
+        `when`(clinicRestClient.retrieveTimeSlots(anyString(), anyString(), anyString(), anyString())).thenThrow(RuntimeException("to test unexpected flow"))
+    }
+
+    protected fun mockTimeSlotToRaiseTherapieException() {
+        `when`(clinicRestClient.retrieveTimeSlots(anyString(), anyString(), anyString(), anyString())).thenThrow(TherapieRuntimeException("error.generic","Generic error"))
+    }
+
+    protected fun mockTimeSlotToRaiseNotFoundError() {
+        `when`(clinicRestClient.retrieveTimeSlots(anyString(), anyString(), anyString(), anyString())).thenThrow(FeignException.NotFound("", mockFeignRequest(), ByteArray(1)))
+    }
+
+    protected fun mockTimeSlotToRaiseCommunicationError() {
+        `when`(clinicRestClient.retrieveTimeSlots(anyString(), anyString(), anyString(), anyString())).thenThrow(RetryableException(500, "", Request.HttpMethod.POST, Date(), mockFeignRequest()))
     }
 
     protected fun mockClinicalService(serviceId: String) {
@@ -72,7 +93,7 @@ open class BaseTest {
         `when`(clinicRestClient.retrieveTimeSlots(anyString(), anyString(), anyString(), anyString())).thenReturn(listOf)
     }
 
-    protected fun mockClinic(clinicId:String) {
+    protected fun mockClinic(clinicId: String) {
         `when`(clinicRestClient.retrieveById(anyString(), anyString())).thenReturn(Clinic(clinicId))
     }
 
@@ -85,40 +106,33 @@ open class BaseTest {
         `when`(customerRestClient.retrieveById(anyString(), anyString())).thenReturn(customer)
     }
 
-    protected fun mockCustomerNotFoundError() {
+    protected fun mockCustomerToRaiseNotFoundError() {
         `when`(customerRestClient.retrieveById(anyString(), anyString())).thenThrow(FeignException.NotFound("", mockFeignRequest(), ByteArray(1)))
     }
 
-    protected fun mockCustomerCommunicationError() {
-        `when`(customerRestClient.retrieveById(anyString(), anyString())).thenThrow(RetryableException(500,"",Request.HttpMethod.POST,Date(),mockFeignRequest()))
+    protected fun mockCustomerToRaiseCommunicationError() {
+        `when`(customerRestClient.retrieveById(anyString(), anyString())).thenThrow(RetryableException(500, "", Request.HttpMethod.POST, Date(), mockFeignRequest()))
     }
 
-    protected fun mockClinicNotFoundError() {
+    protected fun mockClinicToRaiseNotFoundError() {
         `when`(clinicRestClient.retrieveById(anyString(), anyString())).thenThrow(FeignException.NotFound("", mockFeignRequest(), ByteArray(1)))
     }
 
-    protected fun mockClinicCommunicationError() {
-        `when`(clinicRestClient.retrieveById(anyString(), anyString())).thenThrow(RetryableException(500,"",Request.HttpMethod.POST,Date(),
+    protected fun mockClinicToRaiseCommunicationError() {
+        `when`(clinicRestClient.retrieveById(anyString(), anyString())).thenThrow(RetryableException(500, "", Request.HttpMethod.POST, Date(),
                 mockFeignRequest()))
     }
 
     private fun mockFeignRequest() =
             Request.create(Request.HttpMethod.POST, "", emptyMap(), ByteArray(1), Charset.defaultCharset(), RequestTemplate())
 
-    protected fun mockTimeSlotNotFoundError() {
-        `when`(clinicRestClient.retrieveById(anyString(), anyString())).thenThrow(FeignException.NotFound("", mockFeignRequest(), ByteArray(1)))
-    }
 
-    protected fun mockTimeSlotCommunicationError() {
-        `when`(clinicRestClient.retrieveById(anyString(), anyString())).thenThrow(RetryableException(500,"",Request.HttpMethod.POST,Date(),mockFeignRequest()))
-    }
-
-    protected fun mockClinicalServiceNotFound() {
+    protected fun mockClinicalServiceToRaiseNotFound() {
         `when`(clinicalServicesRestClient.retrieveById(anyString(), anyString())).thenThrow(FeignException.NotFound("", mockFeignRequest(), ByteArray(1)))
     }
 
-    protected fun mockClinicalServiceCommunicationError() {
-        `when`(clinicalServicesRestClient.retrieveById(anyString(), anyString())).thenThrow(RetryableException(500,"",Request.HttpMethod.POST,Date(),mockFeignRequest()))
+    protected fun mockClinicalServiceToRaiseCommunicationError() {
+        `when`(clinicalServicesRestClient.retrieveById(anyString(), anyString())).thenThrow(RetryableException(500, "", Request.HttpMethod.POST, Date(), mockFeignRequest()))
     }
 
 }

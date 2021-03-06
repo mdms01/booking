@@ -2,7 +2,6 @@ package com.therapie.interview.booking.model.entity
 
 import java.io.Serializable
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import javax.persistence.*
 
@@ -19,7 +18,7 @@ data class BookingEntity(
         val serviceId: String,
 
         @Id
-        @Column(name = "date", )
+        @Column(name = "date")
         val date: LocalDate,
 
         @Id
@@ -27,7 +26,7 @@ data class BookingEntity(
         val startTime: LocalTime,
 
         @Column(name = "customer_id")
-        val customerId: String):Serializable
+        val customerId: String) : Serializable
 
 data class BookingKey(
         val clinicId: String = "",

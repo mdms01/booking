@@ -30,9 +30,11 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+	implementation ("io.github.microutils:kotlin-logging:1.4.9")
 	runtimeOnly("com.h2database:h2")
 	runtimeOnly("mysql:mysql-connector-java")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
 }
 
 dependencyManagement {

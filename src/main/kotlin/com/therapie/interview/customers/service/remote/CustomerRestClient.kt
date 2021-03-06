@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 
-@FeignClient(value = "customerRestClient", url = "\${app.services.customer.url}", )
+@FeignClient(value = "customerRestClient", url = "\${app.services.customer.url}")
 interface CustomerRestClient {
 
-    @Cacheable(value =["customer"])
+    @Cacheable(value = ["customer"])
     @RequestMapping(method = [RequestMethod.GET], value = ["/customers/{customerId}"])
     fun retrieveById(@PathVariable("customerId") customerId: String, @RequestHeader("x-api-key") apikey: String): Customer
 

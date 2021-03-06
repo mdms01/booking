@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -16,6 +17,10 @@ interface BookingRepository : JpaRepository<BookingEntity, BookingKey> {
     @Query("select b from Bookings b where b.clinicId = :clinicId ")
     fun findByClinic(clinicId: String): List<BookingEntity>
 
+    @Query("select b from Bookings b where b.clinicId = :clinicId and b.serviceId = :serviceId and b.date = :date")
+    fun findByClinicAndServiceAndDate(clinicId: String, serviceId: String, date: LocalDate): List<BookingEntity>
+
+    @Transactional
     @Modifying
     @Query(value = "insert into bookings (clinic_id, service_id, date, start_time, customer_id) values (:clinicId, :serviceId,:date ,:startTime, :customerId)",
             nativeQuery = true)

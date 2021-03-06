@@ -9,15 +9,15 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
-class ClinicalServiceTypeServiceRestAdapter (val clinicalServicesRestClient: ClinicalServicesRestClient): ClinicalServiceTypeService {
+class ClinicalServiceTypeServiceRestAdapter(val clinicalServicesRestClient: ClinicalServicesRestClient) : ClinicalServiceTypeService {
 
     @Value("\${app.services.clinics.apiKey}")
-    lateinit var apiKey:String
+    lateinit var apiKey: String
 
     override fun retrieveById(serviceId: String): ClinicalService {
         try {
             return clinicalServicesRestClient.retrieveById(serviceId, apiKey)
-        } catch (exception:FeignException.NotFound){
+        } catch (exception: FeignException.NotFound) {
             throw NotFoundExeception("error.clinical_service.not_found",
                     "Clinical service $serviceId not found",
                     mapOf("objectId" to serviceId))

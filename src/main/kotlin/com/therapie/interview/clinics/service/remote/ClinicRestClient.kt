@@ -8,16 +8,15 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
-import java.time.LocalDate
 
-@FeignClient(value = "clinicRestClient", url = "\${app.services.clinics.url}", )
+@FeignClient(value = "clinicRestClient", url = "\${app.services.clinics.url}")
 interface ClinicRestClient {
 
-    @Cacheable(value =["clinics"])
+    @Cacheable(value = ["clinics"])
     @RequestMapping(method = [RequestMethod.GET], value = ["/clinics/{clinicId}"])
     fun retrieveById(@PathVariable("clinicId") clinicId: String, @RequestHeader("x-api-key") apikey: String): Clinic
 
-    @Cacheable(value =["clinics_time_slots"])
+    @Cacheable(value = ["clinics_time_slots"])
     @RequestMapping(method = [RequestMethod.GET], value = ["/clinics/{clinicId}/services/{serviceId}/timeslots/{date}"])
     fun retrieveTimeSlots(@PathVariable("clinicId") clinicId: String,
                           @PathVariable("serviceId") serviceId: String,
