@@ -14,7 +14,7 @@ cache:
   timeoutInSeconds: ${DEFAULT_CACHE_TIMEOUT:5000000}
   redisPort: ${REDIS_PORT:6379}
   redisHost: ${REDIS_HOST:localhost}
-  type: REDIS
+  type: MEMORY
   configs:
     bookings:
       enabled: true

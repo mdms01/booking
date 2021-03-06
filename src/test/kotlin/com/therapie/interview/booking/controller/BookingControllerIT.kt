@@ -31,8 +31,8 @@ internal class BookingControllerIT : BaseTest() {
     companion object {
         const val IDEMPOTENT_KEY_HEADER_NAME = "x-idempotent-key"
         const val BOOKING_URI = "/bookings"
-        const val BOOKINGS_FOR_A_CLINIC_URI = "/clinic/{clinicId}/bookings"
-        const val TIME_AVALIABLE_URI = "/clinic/{clinicId}/services/{serviceId}/bookings/available/{date}"
+        const val BOOKINGS_FOR_A_CLINIC_URI = "/clinics/{clinicId}/bookings"
+        const val TIME_AVALIABLE_URI = "/clinics/{clinicId}/services/{serviceId}/bookings/available/{date}"
     }
 
 

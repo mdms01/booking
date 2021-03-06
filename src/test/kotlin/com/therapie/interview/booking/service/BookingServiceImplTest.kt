@@ -31,7 +31,7 @@ internal class BookingServiceImplTest {
 
     @Autowired
     lateinit var bookingService: BookingService
-
+/*
     @Test
     fun `book - clinic doesnt exists`() {
         clinicalServiceTypeService.retrieveById("234234")
@@ -109,4 +109,6 @@ internal class BookingServiceImplTest {
     @Test
     fun retrieveFreeTimeSlots() {
     }
+
+ */
 }

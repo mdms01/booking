@@ -21,12 +21,12 @@ class BookingController(val bookingService: BookingService) {
         return ResponseEntity.ok(bookingService.book(requestWithIdempotentKey))
     }
 
-    @GetMapping(value = ["/clinic/{clinicId}/bookings"], produces = ["application/json"])
+    @GetMapping(value = ["/clinics/{clinicId}/bookings"], produces = ["application/json"])
     fun retrieveBookingsForAClinic(@PathVariable("clinicId") clinicId: String): ResponseEntity<List<Booking>> {
         return ResponseEntity.ok(bookingService.retrieveBookingsByClinic(clinicId))
     }
 
-    @GetMapping(value = ["/clinic/{clinicId}/services/{serviceId}/bookings/available/{date}"],
+    @GetMapping(value = ["/clinics/{clinicId}/services/{serviceId}/bookings/available/{date}"],
             produces = ["application/json"])
     fun retrieveFreeBookableTimes(@PathVariable("clinicId") clinicId: String,
                                   @PathVariable("serviceId") serviceId: String,
