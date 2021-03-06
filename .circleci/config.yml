@@ -65,6 +65,7 @@ jobs:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
           cluster-name: << parameters.cluster-name >>
+          aws-region: eu-west-1
       - run:
           command: |
             kubectl get services
@@ -93,6 +94,7 @@ workflows:
       - build
       - test-cluster:
           cluster-name: booking-cluster
+          aws-region: eu-west-1
       - create-deployment:
           cluster-name: booking-cluster
           requires:
