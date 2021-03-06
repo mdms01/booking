@@ -44,6 +44,8 @@ jobs:
       - run: gradle build
       - store_test_results:
             path: build/test-results/test
+      - attach_workspace:
+          at: build
 workflows:
   build_and_push_image:
     jobs:
