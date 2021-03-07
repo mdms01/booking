@@ -85,7 +85,7 @@ jobs:
           install-kubectl: true
           verbose: true
       - kubernetes/create-or-update-resource:
-          get-rollout-status: true
+          get-rollout-status: false
           resource-file-path: cicd/k8s/booking/deployment.yaml
           resource-name: deployment/booking-deployment
 workflows:

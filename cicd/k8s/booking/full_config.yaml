@@ -4,6 +4,17 @@ metadata:
   name: special-config
   namespace: default
 data:
-  DEBUG_ENABLED: true
-  REMOTE_SERVICE_URL: https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm
-  CONTEXT_PATH: /api
+  REMOTE_SERVICE_URL: "https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm"
+  CONTEXT_PATH: "/api"
+  DEFAULT_CACHE_EXPIRATION: 5000
+  REDIS_PORT: 6379
+  REDIS_HOST: "redis"
+  CACHE_TYPE: REDIS
+  CACHE_EXPIRATION_BOOKINGS: 5000
+  CACHE_EXPIRATION_CLINICS: 5000
+  CACHE_EXPIRATION_TIME_SLOTS: 5000
+  CACHE_EXPIRATION_CLINICAL_SERVICES: 5000
+  DATABASE_URL: "jdbc:h2:mem:booking"
+  DATABASE_DRIVER: "org.h2.Driver"
+  DATABASE_USERNAME: "sa"
+  DATABASE_DIALECT: "org.hibernate.dialect.H2Dialect"
