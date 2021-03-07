@@ -19,6 +19,12 @@ spec:
           image: 316826375590.dkr.ecr.eu-west-1.amazonaws.com/therapie:latest
           ports:
             - containerPort: 9000
+          envFrom:
+            - configMapRef:
+                name: booking-config
+            - secretRef:
+                name: booking-secret
+
 ---
 apiVersion: v1
 kind: Service

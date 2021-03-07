@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: special-config
+  namespace: default
+data:
+  DEBUG_ENABLED: true
+  REMOTE_SERVICE_URL: https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm
+  CONTEXT_PATH: /api

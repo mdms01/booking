@@ -1,35 +1,34 @@
-debug: true
+debug: ${DEBUG_ENABLED:false}
 app:
   services:
     remote:
       url: ${REMOTE_SERVICE_URL:http://localhost}
       apiKey: ${REMOTE_SERVICE_API_KEY:123}
 cache:
-  timeoutInSeconds: ${DEFAULT_CACHE_TIMEOUT:5000000}
+  timeoutInSeconds: ${DEFAULT_CACHE_EXPIRATION:5000}
   redisPort: ${REDIS_PORT:6379}
   redisHost: ${REDIS_HOST:localhost}
-  type: MEMORY
+  type: ${CACHE_TYPE:MEMORY}
   configs:
     bookings:
-      enabled: true
+      expirationInSeconds: ${CACHE_EXPIRATION_BOOKINGS:5000}
     clinics:
-      enabled: true
+      expirationInSeconds: ${CACHE_EXPIRATION_CLINICS:5000}
     clinics_time_slots:
-      enabled: true
-      expirationInSeconds: 5000
+      expirationInSeconds: ${CACHE_EXPIRATION_TIME_SLOTS:5000}
     clinical_services:
-      enabled: true
+      expirationInSeconds: ${CACHE_EXPIRATION_CLINICAL_SERVICES:5000}
 
 spring:
   datasource:
-    url: jdbc:h2:mem:booking
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
+    url: ${DATABASE_URL:jdbc:h2:mem:booking}
+    driverClassName: ${DATABASE_DRIVER:org.h2.Driver}
+    username: ${DATABASE_USERNAME:sa}
+    password: ${DATABASE_PASSWORD:password}
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: ${DATABASE_DIALECT:org.hibernate.dialect.H2Dialect}
 
 server:
   port: 9000
   servlet:
-    contextPath: /api
+    contextPath: ${CONTEXT_PATH:/api}
