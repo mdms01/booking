@@ -1,0 +1,74 @@
+openapi: "3.0.1"
+info:
+  title: "Booking-api"
+  version: "0.0.1"
+servers:
+  - url: "https://mjag5ib4jc.execute-api.eu-west-1.amazonaws.com/{basePath}"
+    variables:
+      basePath:
+        default: "/api"
+paths:
+  /clinics/{clinicId}/service/{serviceid}/bookings/available/{date}:
+    get:
+      parameters:
+        - name: "serviceid"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "date"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "clinicId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+  /clinics/{clinicId}/bookings:
+    get:
+      parameters:
+        - name: "clinicId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+
+  /bookings:
+    get:
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+    post:
+      responses:
+        "200":
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+
+components:
+  schemas:
+    Empty:
+      title: "Empty Schema"
+      type: "object"

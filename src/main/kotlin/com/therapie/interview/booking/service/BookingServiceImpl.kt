@@ -41,7 +41,7 @@ class BookingServiceImpl(
     override fun retrieveFreeTimeSlots(clinicId: String, serviceId: String, date: LocalDate): List<LocalTime> {
         checkClinic(clinicId)
         val clinicalServiceType = clinicalServiceTypeService.retrieveById(serviceId)
-        val bookableTimeSlots = clinicService.retrieveBookableTimeSlots(clinicId, serviceId, date, clinicalServiceType.durationInMunites)
+        val bookableTimeSlots = clinicService.retrieveBookableTimeSlots(clinicId, serviceId, date, clinicalServiceType.durationInMinutes)
         val bookedTimes = bookingRepository.findByClinicAndServiceAndDate(clinicId, serviceId, date).map { it.startTime }.toSet()
         return bookableTimeSlots.filterNot { bookedTimes.contains(it) }
 
@@ -51,7 +51,7 @@ class BookingServiceImpl(
         checkClinic(bookingRequest.clinicId)
         checkCustomer(bookingRequest)
         val clinicalServiceType = clinicalServiceTypeService.retrieveById(bookingRequest.serviceId)
-        val timeSlot = bookingRequest.toTimeSlot(clinicalServiceType.durationInMunites.toLong())
+        val timeSlot = bookingRequest.toTimeSlot(clinicalServiceType.durationInMinutes)
         clinicService.checkTimeSlotIsValid(timeSlot)
     }
 

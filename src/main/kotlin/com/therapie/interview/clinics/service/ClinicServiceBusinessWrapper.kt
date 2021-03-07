@@ -1,8 +1,7 @@
 package com.therapie.interview.clinics.service
 
 
-import com.therapie.interview.clinics.exception.TimeSlotException
-import com.therapie.interview.clinics.model.TimeRange
+import com.therapie.interview.clinics.model.TimeAvailability
 import com.therapie.interview.clinics.model.TimeSlot
 import mu.KLogging
 import org.springframework.beans.factory.annotation.Qualifier
@@ -13,78 +12,37 @@ import java.time.LocalTime
 
 @Service
 @Primary
-class ClinicServiceBusinessWrapper(@Qualifier("clinicWrapper") val wrapped: ClinicService) : ClinicService {
-    companion object : KLogging() {
-        const val SIXTY_SECONDS = 60
-    }
+class ClinicServiceBusinessWrapper(@Qualifier("clinicServiceRest") val wrapped: ClinicService) : ClinicService {
+    companion object : KLogging()
 
     override fun retrieveClinicById(clinicId: String) =
             wrapped.retrieveClinicById(clinicId)
 
 
-    override fun retrieveTimeSlots(clinicId: String, serviceId: String, date: LocalDate) =
-            wrapped.retrieveTimeSlots(clinicId, serviceId, date)
-
+    override fun retrieveTimeAvailabilitiesForTimeSlot(clinicId: String, serviceId: String, date: LocalDate, serviceDurationInMinutes: Long): List<TimeAvailability> {
+        val timeAvailability = wrapped.retrieveTimeAvailabilitiesForTimeSlot(clinicId, serviceId, date, serviceDurationInMinutes)
+        val timeAvailabilityLogic = TimeAvailabilityLogic(clinicId, serviceId, date, serviceDurationInMinutes)
+        return timeAvailabilityLogic.validateTimeAvailability(timeAvailability)
+    }
 
     override fun checkTimeSlotIsValid(timeSlot: TimeSlot) {
+        val clinicId = timeSlot.clinicId
+        val serviceId = timeSlot.serviceId
+        val date = timeSlot.date
+        val serviceDurationInMinutes = timeSlot.durationInMinutes
 
-        val endTime = timeSlot.getEndTime()
-        val serviceShifts = wrapped.retrieveTimeSlots(timeSlot.clinicId, timeSlot.serviceId, timeSlot.date)
-        assertThereAreSlots(serviceShifts, timeSlot)
+        val timeAvailabilities = retrieveTimeAvailabilitiesForTimeSlot(clinicId, serviceId, date, serviceDurationInMinutes)
 
-        val shift = getShiftWhereTimeSlotFits(serviceShifts, timeSlot, endTime)
+        val timeAvailabilityLogic = TimeAvailabilityLogic(clinicId, serviceId, date, serviceDurationInMinutes)
 
-        assertTimeSlotFitsInShift(timeSlot, shift)
-
+        timeAvailabilityLogic.assertTimeSlotFitsInOneOfTimeAvailabilities(timeSlot, timeAvailabilities)
     }
 
-    override fun retrieveBookableTimeSlots(clinicId: String, serviceId: String, date: LocalDate, durationInMinutes: Long): List<LocalTime> {
-        val timeSlots = retrieveTimeSlots(clinicId, serviceId, date)
-        return generateBookableTimeSlots(timeSlots, durationInMinutes)
+    override fun retrieveBookableTimeSlots(clinicId: String, serviceId: String, date: LocalDate, serviceDurationInMinutes: Long): List<LocalTime> {
+        val timeAvailabilities = retrieveTimeAvailabilitiesForTimeSlot(clinicId, serviceId, date, serviceDurationInMinutes)
+        val timeAvailabilityLogic = TimeAvailabilityLogic(clinicId, serviceId, date, serviceDurationInMinutes)
+        return timeAvailabilityLogic.generateBookableTimeSlots(timeAvailabilities)
     }
 
-    private fun getShiftWhereTimeSlotFits(serviceShifts: List<TimeRange>, timeSlot: TimeSlot, endTime: LocalTime): TimeRange {
-        return serviceShifts.firstOrNull { it.startTime <= timeSlot.startTime && it.endTime >= endTime }
-                ?: throw TimeSlotException("error.time_slot.no_match", "There is no available slots for date ${timeSlot.date} between ${timeSlot.startTime} and $endTime",
-                        mapOf<String, Any>("date" to timeSlot.date, "startTime" to timeSlot.startTime, "endTime" to endTime))
-    }
-
-    private fun assertTimeSlotFitsInShift(timeSlot: TimeSlot, timeRange: TimeRange) {
-        val serviceDurationInSeconds = timeSlot.durationInMinutes * SIXTY_SECONDS
-        val timeDifferenceInSeconds = (timeSlot.startTime - timeRange.startTime).toSecondOfDay()
-
-        if (!isTimeSlotFit(timeDifferenceInSeconds, serviceDurationInSeconds)) {
-            throw TimeSlotException("error.time_slot.wrong_start_time", "There is no option to book the service at ${timeSlot.startTime}")
-        }
-    }
-
-    private fun isTimeSlotFit(timeDifferenceInSeconds: Int, serviceDurationInSeconds: Long) =
-            (timeDifferenceInSeconds % serviceDurationInSeconds) == 0L
-
-    private fun assertThereAreSlots(retrieveTimeSlots: List<TimeRange>, timeSlot: TimeSlot) {
-        if (retrieveTimeSlots.isEmpty()) {
-            throw TimeSlotException("error.time_slot.no_available", "There is no available slots for date ${timeSlot.date}",
-                    mapOf("date" to timeSlot.date))
-        }
-    }
-
-    private fun generateBookableTimeSlots(timeSlots: List<TimeRange>, durationInMunites: Long): List<LocalTime> {
-        return timeSlots.flatMap { generateBookableTimeSlots(durationInMunites, it) }
-
-    }
-
-    private fun generateBookableTimeSlots(durationInMinutes: Long, timeSlots: TimeRange): List<LocalTime> {
-        var startTime = timeSlots.startTime
-        val bookableTimeSlots = mutableListOf<LocalTime>()
-        while (startTime.plusMinutes(durationInMinutes) <= timeSlots.endTime) {
-            bookableTimeSlots.add(startTime)
-            startTime = startTime.plusMinutes(durationInMinutes)
-        }
-        return bookableTimeSlots
-    }
-
-
-    operator fun LocalTime.minus(startTime: LocalTime): LocalTime =
-            LocalTime.ofNanoOfDay(this.toNanoOfDay() - startTime.toNanoOfDay())
 
 }

@@ -1,7 +1,7 @@
 package com.therapie.interview.clinics.service.remote
 
 import com.therapie.interview.clinics.model.Clinic
-import com.therapie.interview.clinics.model.TimeRange
+import com.therapie.interview.clinics.model.TimeAvailability
 import com.therapie.interview.clinics.model.TimeSlot
 import com.therapie.interview.clinics.service.ClinicService
 import com.therapie.interview.common.exceptions.NotFoundExeception
@@ -11,9 +11,13 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import javax.validation.Valid
 
-@Component("clinicWrapper")
+@Component("clinicServiceRest")
 class ClinicServiceRestAdapter(val restClient: ClinicRestClient) : ClinicService {
+    companion object KLogging {
+         val DATA_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    }
 
     @Value("\${app.services.remote.apiKey}")
     lateinit var apiKey: String
@@ -28,9 +32,11 @@ class ClinicServiceRestAdapter(val restClient: ClinicRestClient) : ClinicService
         }
     }
 
-    override fun retrieveTimeSlots(clinicId: String, serviceId: String, date: LocalDate): List<TimeRange> {
+    override fun retrieveTimeAvailabilitiesForTimeSlot(clinicId: String, serviceId: String, date: LocalDate, durationInMinutes: Long): List<TimeAvailability> {
         try {
-            return restClient.retrieveTimeSlots(clinicId, serviceId, formattedDate(date), apiKey)
+            val formattedDate = formattedDate(date)
+            return restClient.retrieveTimeSlots(clinicId, serviceId, formattedDate, apiKey)
+
         } catch (exception: FeignException.NotFound) {
             throw NotFoundExeception("error.time_slot.not_found",
                     "There is no services available for clinic $clinicId on service $serviceId for date $date",
@@ -47,6 +53,6 @@ class ClinicServiceRestAdapter(val restClient: ClinicRestClient) : ClinicService
         throw NotImplementedError("Not to be implemented")
     }
 
-    private fun formattedDate(date: LocalDate) = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    private fun formattedDate(date: LocalDate) = date.format(DATA_FORMATTER)
 
 }

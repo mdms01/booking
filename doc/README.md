@@ -26,6 +26,7 @@ Booking system uses Clinics and customers system to validate customers bookings,
 
 #### Assumptions 
 * There is no intersection between time slots
+* The time slots are the clinic location time zone
 * There is no appointment which start at day X and finishes at day X+1
 
 #### Concerns
@@ -43,7 +44,7 @@ Booking system uses Clinics and customers system to validate customers bookings,
 
 
 #### Decisions
-* Store at GMT +0
+
 * As the concurrency in the booking is hard, a trade off must be put in place, compromisse the schedule flexibility with guaranteed no double bookings
 * Caching for Services and clinic timeslots are mandatory to prevent complications on booking
 * Use relational database due query capabilities even the book looks like a key value pair

@@ -27,19 +27,24 @@ import java.util.*
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [BookingApplication::class, CacheConfiguration::class])
 @WebAppConfiguration
-internal class BookingControllerIT : BaseTest() {
+internal class BookingControllerCT : BaseTest() {
     companion object {
         const val IDEMPOTENT_KEY_HEADER_NAME = "x-idempotent-key"
         const val BOOKING_URI = "/bookings"
         const val BOOKINGS_FOR_A_CLINIC_URI = "/clinics/{clinicId}/bookings"
         const val TIME_AVALIABLE_URI = "/clinics/{clinicId}/services/{serviceId}/bookings/available/{date}"
+        const val DEFAULT_CUSTOMER_ID = "customer123"
+        const val DEFAULT_SERVICE_ID = "23423"
+        val DEFAULT_DATE = LocalDate.of(2021, 3, 4)
+        val DEFAULT_TIME = LocalTime.of(9, 30, 0)
+        
     }
 
 
     @Test
     fun `book - successful`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c121"
 
         mockClinic(clinicId)
@@ -47,14 +52,30 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         bookSuccessfully(bookingRequest, idempotentKey)
     }
 
     @Test
+    fun `book - invalid time range`() {
+        
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
+        val clinicId = "c121"
+
+        mockClinic(clinicId)
+        mockCustomer(customerId)
+        mockClinicalService(serviceId)
+        mockInvalidTimeSlots(2)
+        val idempotentKey = UUID.randomUUID().toString()
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
+        book(bookingRequest, idempotentKey, status().isInternalServerError)
+    }
+
+    @Test
     fun `book - doesnt match schedule day`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c121"
 
         mockClinic(clinicId)
@@ -62,14 +83,14 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 31, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, LocalTime.of(9, 31, 0))
         book(bookingRequest, idempotentKey, status().isBadRequest)
     }
 
     @Test
     fun `book - repeated action`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c123"
 
         mockClinic(clinicId)
@@ -77,15 +98,15 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         bookSuccessfully(bookingRequest, idempotentKey)
         bookSuccessfully(bookingRequest, idempotentKey)
     }
 
     @Test
     fun `book - multiple bookings with same idempotent key`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c1238"
 
         mockClinic(clinicId)
@@ -94,17 +115,17 @@ internal class BookingControllerIT : BaseTest() {
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
 
-        val firstBookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val firstBookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         bookSuccessfully(firstBookingRequest, idempotentKey)
 
-        val secondBookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 0, 0))
+        val secondBookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, LocalTime.of(9, 0, 0))
         bookSuccessfully(secondBookingRequest, idempotentKey)
     }
 
     @Test
     fun `book - appointment conflict`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c124"
 
         mockClinic(clinicId)
@@ -112,7 +133,7 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockTimeSlots(2)
 
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         book(bookingRequest, null, status().isOk)
 
         book(bookingRequest, null, status().isConflict)
@@ -126,8 +147,8 @@ internal class BookingControllerIT : BaseTest() {
 
     @Test
     fun `book - clinic doesnt exists`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c122"
 
         mockClinicToRaiseNotFoundError()
@@ -135,14 +156,15 @@ internal class BookingControllerIT : BaseTest() {
         mockCustomer(customerId)
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         book(bookingRequest, idempotentKey, status().isNotFound)
     }
 
     @Test
     fun `book - network failure when calling clinic system`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c122"
 
         mockClinicToRaiseCommunicationError()
@@ -150,14 +172,14 @@ internal class BookingControllerIT : BaseTest() {
         mockCustomer(customerId)
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         book(bookingRequest, idempotentKey, status().isServiceUnavailable)
     }
 
     @Test
     fun `book - clinical service doesnt exists`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c121"
 
         mockClinic(clinicId)
@@ -165,15 +187,15 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalServiceToRaiseNotFound()
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         book(bookingRequest, idempotentKey, status().isNotFound)
 
     }
 
     @Test
     fun `book - time slots doesnt exists`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c121"
 
         mockClinic(clinicId)
@@ -181,15 +203,15 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockTimeSlotToRaiseNotFoundError()
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
 
         book(bookingRequest, idempotentKey, status().isNotFound)
     }
 
     @Test
     fun `book - time slots for a date are empty`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c121"
 
         mockClinic(clinicId)
@@ -197,15 +219,15 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockEmptyTimeSlots()
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
 
         book(bookingRequest, idempotentKey, status().isBadRequest)
     }
 
     @Test
     fun `book - network failure when calling clinical services type system`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c121"
 
         mockClinic(clinicId)
@@ -213,31 +235,32 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalServiceToRaiseCommunicationError()
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         book(bookingRequest, idempotentKey, status().isServiceUnavailable)
 
     }
 
     @Test
     fun `book - customer doesnt exists`() {
-        val customerId = "123"
-        val serviceId = "23423"
-        val clinicId = "c121"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
+        val clinicId = "c021"
 
         mockClinic(clinicId)
         mockCustomerToRaiseNotFoundError()
         mockClinicalService(serviceId)
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         book(bookingRequest, idempotentKey, status().isNotFound)
 
     }
 
     @Test
     fun `book - network failure when calling customers system `() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c121"
 
         mockClinic(clinicId)
@@ -245,30 +268,32 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         book(bookingRequest, idempotentKey, status().isServiceUnavailable)
 
     }
 
     @Test
-    fun `book - there isnt time slots available `() {
-        val customerId = "123"
-        val serviceId = "23423"
+    fun `book - there isn't time slots available`() {
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c121"
 
         mockClinic(clinicId)
         mockCustomer(customerId)
         mockClinicalService(serviceId)
+
         mockTimeSlotToRaiseNotFoundError()
+
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         book(bookingRequest, idempotentKey, status().isNotFound)
     }
 
     @Test
     fun `book - network failure when retrieving time slots `() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c121"
 
         mockClinic(clinicId)
@@ -276,15 +301,15 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockTimeSlotToRaiseCommunicationError()
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         book(bookingRequest, idempotentKey, status().isServiceUnavailable)
 
     }
 
     @Test
     fun `retrieve bookings - single booking`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c120"
 
         mockClinic(clinicId)
@@ -292,7 +317,7 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockTimeSlots(2)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), LocalTime.of(9, 30, 0))
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         bookSuccessfully(bookingRequest, idempotentKey)
 
         getRequest(BOOKINGS_FOR_A_CLINIC_URI, clinicId)
@@ -302,8 +327,8 @@ internal class BookingControllerIT : BaseTest() {
 
     @Test
     fun `retrieve bookings - multiple bookings`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c1207"
 
         mockClinic(clinicId)
@@ -314,7 +339,7 @@ internal class BookingControllerIT : BaseTest() {
         var startTime = LocalTime.of(8, 0, 0)
         (0..5).forEach { _ ->
             val idempotentKey = UUID.randomUUID().toString()
-            val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), startTime)
+            val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, startTime)
             startTime = startTime.plusMinutes(30)
             bookSuccessfully(bookingRequest, idempotentKey)
         }
@@ -325,8 +350,8 @@ internal class BookingControllerIT : BaseTest() {
 
     @Test
     fun `book - unavailable slot`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c1207"
 
         mockClinic(clinicId)
@@ -336,14 +361,14 @@ internal class BookingControllerIT : BaseTest() {
 
         var startTime = LocalTime.of(12, 0, 0)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), startTime)
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, startTime)
         book(bookingRequest, idempotentKey, status().isBadRequest)
     }
 
     @Test
     fun `book - unexpected exception`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c1207"
 
         mockClinic(clinicId)
@@ -353,14 +378,14 @@ internal class BookingControllerIT : BaseTest() {
 
         var startTime = LocalTime.of(12, 0, 0)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), startTime)
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, startTime)
         book(bookingRequest, idempotentKey, status().isInternalServerError)
     }
 
     @Test
     fun `book - generic exception`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c1207"
 
         mockClinic(clinicId)
@@ -370,7 +395,7 @@ internal class BookingControllerIT : BaseTest() {
 
         var startTime = LocalTime.of(12, 0, 0)
         val idempotentKey = UUID.randomUUID().toString()
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), startTime)
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, startTime)
         book(bookingRequest, idempotentKey, status().isBadRequest)
     }
 
@@ -394,15 +419,15 @@ internal class BookingControllerIT : BaseTest() {
 
     @Test
     fun `retrieve avaliable - no bookings`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c1201"
 
         mockClinic(clinicId)
         mockCustomer(customerId)
         mockClinicalService(serviceId)
         mockTimeSlots(1)
-        getRequest(TIME_AVALIABLE_URI, clinicId, serviceId, LocalDate.of(2021, 3, 4))
+        getRequest(TIME_AVALIABLE_URI, clinicId, serviceId, DEFAULT_DATE)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("*", Matchers.hasSize<Any>(16)))
 
@@ -410,7 +435,7 @@ internal class BookingControllerIT : BaseTest() {
 
     @Test
     fun `retrieve avaliable - invalid path parameter`() {
-        val serviceId = "23423"
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c1201"
         getRequest(TIME_AVALIABLE_URI, clinicId, serviceId, "invalidDate")
                 .andExpect(status().isBadRequest)
@@ -418,8 +443,8 @@ internal class BookingControllerIT : BaseTest() {
 
     @Test
     fun `retrieve avaliable - one booking`() {
-        val customerId = "123"
-        val serviceId = "23423"
+        val customerId = DEFAULT_CUSTOMER_ID
+        val serviceId = DEFAULT_SERVICE_ID
         val clinicId = "c1202"
 
         mockClinic(clinicId)
@@ -427,14 +452,14 @@ internal class BookingControllerIT : BaseTest() {
         mockClinicalService(serviceId)
         mockTimeSlots(1)
         val idempotentKey = UUID.randomUUID().toString()
-        val startTime = LocalTime.of(9, 30, 0)
-        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, LocalDate.of(2021, 3, 4), startTime)
+
+        val bookingRequest = BookingRequest(customerId, clinicId, serviceId, DEFAULT_DATE, DEFAULT_TIME)
         bookSuccessfully(bookingRequest, idempotentKey)
 
-        getRequest(TIME_AVALIABLE_URI, clinicId, serviceId, LocalDate.of(2021, 3, 4))
+        getRequest(TIME_AVALIABLE_URI, clinicId, serviceId, DEFAULT_DATE)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("*", Matchers.hasSize<Any>(15)))
-                .andExpect(jsonPath("*", Matchers.not(Matchers.containsInAnyOrder(startTime))))
+                .andExpect(jsonPath("*", Matchers.not(Matchers.containsInAnyOrder(DEFAULT_TIME))))
 
     }
 

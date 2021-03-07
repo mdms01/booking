@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.therapie.interview.clinical_services.model.ClinicalService
 import com.therapie.interview.clinical_services.service.remote.ClinicalServicesRestClient
 import com.therapie.interview.clinics.model.Clinic
-import com.therapie.interview.clinics.model.TimeRange
+import com.therapie.interview.clinics.model.TimeAvailability
 import com.therapie.interview.clinics.service.remote.ClinicRestClient
 import com.therapie.interview.common.exceptions.TherapieRuntimeException
 import com.therapie.interview.customers.model.Customer
@@ -21,7 +21,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
-import java.math.BigDecimal
 import java.nio.charset.Charset
 import java.time.LocalTime
 import java.util.*
@@ -54,15 +53,29 @@ open class BaseTest {
         val timeSlots = buildTimeSlots(amount, startTime, sizeInMinutes, intervalInMinutes)
         mockClinicalServicesTimeSlots(timeSlots)
     }
+    protected fun mockInvalidTimeSlots(amount: Int, startHour: Int = 8, startMinute: Int = 0, sizeInMinutes: Int = 4 * 60, intervalInMinutes: Int = 30) {
+        var startTime = LocalTime.of(startHour, startMinute)
+        val timeSlots = buildInvalidTimeSlots(amount, startTime, sizeInMinutes, intervalInMinutes)
+        mockClinicalServicesTimeSlots(timeSlots)
+    }
 
     protected fun mockEmptyTimeSlots() {
         mockClinicalServicesTimeSlots(emptyList())
     }
 
-    private fun buildTimeSlots(amount: Int, startTime: LocalTime, sizeInMinutes: Int, intervalInMinutes: Int): List<TimeRange> {
+    private fun buildTimeSlots(amount: Int, startTime: LocalTime, sizeInMinutes: Int, intervalInMinutes: Int): List<TimeAvailability> {
         var currentTime = startTime
         return (0..amount).map {
-            val time = TimeRange(currentTime, currentTime.plusMinutes(sizeInMinutes.toLong()))
+            val time = TimeAvailability(currentTime, currentTime.plusMinutes(sizeInMinutes.toLong()))
+            currentTime = currentTime.plusMinutes(sizeInMinutes.toLong() + intervalInMinutes.toLong())
+            time
+        }
+    }
+
+    private fun buildInvalidTimeSlots(amount: Int, startTime: LocalTime, sizeInMinutes: Int, intervalInMinutes: Int): List<TimeAvailability> {
+        var currentTime = startTime
+        return (0..amount).map {
+            val time = TimeAvailability( currentTime.plusMinutes(sizeInMinutes.toLong()),currentTime)
             currentTime = currentTime.plusMinutes(sizeInMinutes.toLong() + intervalInMinutes.toLong())
             time
         }
@@ -84,12 +97,12 @@ open class BaseTest {
         `when`(clinicRestClient.retrieveTimeSlots(anyString(), anyString(), anyString(), anyString())).thenThrow(RetryableException(500, "", Request.HttpMethod.POST, Date(), mockFeignRequest()))
     }
 
-    protected fun mockClinicalService(serviceId: String) {
-        val clinicalService = ClinicalService(serviceId, "clinical service $serviceId", BigDecimal.TEN, 30)
+    protected fun mockClinicalService(serviceId: String, durationInMinutes: Long = 30) {
+        val clinicalService = ClinicalService(serviceId,  durationInMinutes)
         mockClinicalServices(clinicalService)
     }
 
-    protected fun mockClinicalServicesTimeSlots(listOf: List<TimeRange>) {
+    protected fun mockClinicalServicesTimeSlots(listOf: List<TimeAvailability>) {
         `when`(clinicRestClient.retrieveTimeSlots(anyString(), anyString(), anyString(), anyString())).thenReturn(listOf)
     }
 

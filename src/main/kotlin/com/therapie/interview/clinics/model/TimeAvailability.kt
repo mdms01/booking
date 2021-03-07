@@ -5,12 +5,14 @@ import java.io.Serializable
 import java.time.LocalTime
 import javax.validation.constraints.AssertTrue
 
-data class TimeRange(
+data class TimeAvailability(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "'T'HH:mm:ss")
         val startTime: LocalTime,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "'T'HH:mm:ss")
         val endTime: LocalTime) : Serializable {
 
     @AssertTrue
-    fun assertStartBeforeEnd() = startTime.isBefore(endTime)
+    fun isValid() = startTime.isBefore(endTime)
+
+    fun isShorterThan(seconds:Long) = seconds >= (endTime.toSecondOfDay() - startTime.toSecondOfDay())
 }
