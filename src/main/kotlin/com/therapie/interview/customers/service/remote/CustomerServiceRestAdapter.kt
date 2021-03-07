@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 @Service
 class CustomerServiceRestAdapter(val customerRestClient: CustomerRestClient) : CustomerService {
 
-    @Value("\${app.services.clinics.apiKey}")
+    @Value("\${app.services.remote.apiKey}")
     lateinit var apiKey: String
 
     override fun retrieveCustomer(customerId: String): Customer {

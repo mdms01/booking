@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 
-@FeignClient(value = "clinicRestClient", url = "\${app.services.clinics.url}")
+@FeignClient(value = "clinicRestClient", url = "\${app.services.remote.url}")
 interface ClinicRestClient {
 
     @Cacheable(value = ["clinics"])

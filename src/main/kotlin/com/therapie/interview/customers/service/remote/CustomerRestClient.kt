@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 
-@FeignClient(value = "customerRestClient", url = "\${app.services.customer.url}")
+@FeignClient(value = "customerRestClient", url = "\${app.services.remote.url}")
 interface CustomerRestClient {
 
     @Cacheable(value = ["customer"])

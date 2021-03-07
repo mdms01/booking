@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter
 @Component("clinicWrapper")
 class ClinicServiceRestAdapter(val restClient: ClinicRestClient) : ClinicService {
 
-    @Value("\${app.services.clinics.apiKey}")
+    @Value("\${app.services.remote.apiKey}")
     lateinit var apiKey: String
 
     override fun retrieveClinicById(clinicId: String): Clinic {

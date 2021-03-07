@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class ClinicalServiceTypeServiceRestAdapter(val clinicalServicesRestClient: ClinicalServicesRestClient) : ClinicalServiceTypeService {
 
-    @Value("\${app.services.clinics.apiKey}")
+    @Value("\${app.services.remote.apiKey}")
     lateinit var apiKey: String
 
     override fun retrieveById(serviceId: String): ClinicalService {
