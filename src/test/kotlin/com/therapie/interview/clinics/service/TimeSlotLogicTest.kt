@@ -1,13 +1,13 @@
 package com.therapie.interview.clinics.service
 
-import com.therapie.interview.clinics.model.TimeAvailability
 import com.therapie.interview.clinics.model.TimeSlot
+import com.therapie.interview.clinics.model.ClinicalServiceTimeSlot
 import org.junit.jupiter.api.Test
 
 import java.time.LocalDate
 import java.time.LocalTime
 
-internal class TimeAvailabilityLogicTest {
+internal class TimeSlotLogicTest {
 
     @Test
     fun `assertTimeSlot - time slot fits in the time availability`() {
@@ -16,7 +16,7 @@ internal class TimeAvailabilityLogicTest {
         val durationInMinutes: Long = 10
         val startTime = LocalTime.now()
         val timeSlot = createTimeSlot(startTime, durationInMinutes)
-        val timeRanges = listOf(TimeAvailability(LocalTime.now(), LocalTime.now()))
+        val timeRanges = listOf(TimeSlot(LocalTime.now(), LocalTime.now()))
        // timeSlotLogic.assertTimeSlotFitsInOneOfTimeAvailabilities(timeSlot, timeRanges)
     }
 
@@ -63,14 +63,14 @@ internal class TimeAvailabilityLogicTest {
     @Test
     fun `generateBookableTimeSlots - the duration (20 min) doesnt matches time availability(1h 15min) `() {
         val timeSlotLogic = createTimeAvailabilityLogic(10)
-        val timeAvailability = listOf(TimeAvailability(LocalTime.now(), LocalTime.now()))
+        val timeAvailability = listOf(TimeSlot(LocalTime.now(), LocalTime.now()))
         timeSlotLogic.generateBookableTimeSlots(timeAvailability)
     }
 
     @Test
     fun `generateBookableTimeSlots - the duration 20 min matches exactly time availability 1h`() {
         val timeSlotLogic = createTimeAvailabilityLogic(10)
-        val timeAvailability = listOf(TimeAvailability(LocalTime.now(), LocalTime.now()))
+        val timeAvailability = listOf(TimeSlot(LocalTime.now(), LocalTime.now()))
         timeSlotLogic.generateBookableTimeSlots(timeAvailability)
     }
 
@@ -113,6 +113,6 @@ internal class TimeAvailabilityLogicTest {
 
 
     private fun createTimeSlot(startTime: LocalTime, durationInMinutes: Long) =
-            TimeSlot("10", "11", LocalDate.now(), startTime, durationInMinutes)
+            ClinicalServiceTimeSlot("10", "11", LocalDate.now(), startTime, durationInMinutes)
 
 }

@@ -40,7 +40,7 @@ class ControllerErrorHandler {
 
 
     fun handleGenericDataStructureException(exception: Exception): ResponseEntity<ErrorInformation> {
-        val errorInformation = ErrorInformation("error.client.wrong_structure",
+        val errorInformation = ErrorInformation("error.clinic.wrong_structure",
                 "Request doesn't contain the expected structure")
 
         logger.warn { "Malformed Request:(${errorInformation.id}) ${exception.message}" }

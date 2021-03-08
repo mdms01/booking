@@ -1,8 +1,8 @@
 package com.therapie.interview.clinics.service.remote
 
 import com.therapie.interview.clinics.model.Clinic
-import com.therapie.interview.clinics.model.TimeAvailability
 import com.therapie.interview.clinics.model.TimeSlot
+import com.therapie.interview.clinics.model.ClinicalServiceTimeSlot
 import com.therapie.interview.clinics.service.ClinicService
 import com.therapie.interview.common.exceptions.NotFoundExeception
 import feign.FeignException
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import javax.validation.Valid
 
 @Component("clinicServiceRest")
 class ClinicServiceRestAdapter(val restClient: ClinicRestClient) : ClinicService {
@@ -32,7 +31,7 @@ class ClinicServiceRestAdapter(val restClient: ClinicRestClient) : ClinicService
         }
     }
 
-    override fun retrieveTimeAvailabilitiesForTimeSlot(clinicId: String, serviceId: String, date: LocalDate, durationInMinutes: Long): List<TimeAvailability> {
+    override fun retrieveTimeAvailabilitiesForTimeSlot(clinicId: String, serviceId: String, date: LocalDate, durationInMinutes: Long): List<TimeSlot> {
         try {
             val formattedDate = formattedDate(date)
             return restClient.retrieveTimeSlots(clinicId, serviceId, formattedDate, apiKey)
@@ -45,7 +44,7 @@ class ClinicServiceRestAdapter(val restClient: ClinicRestClient) : ClinicService
 
     }
 
-    override fun checkTimeSlotIsValid(timeSlot: TimeSlot) {
+    override fun checkTimeSlotIsValid(clinicalServiceTimeSlot: ClinicalServiceTimeSlot) {
         throw NotImplementedError("Not to be implemented")
     }
 

@@ -1,3 +1,3 @@
 package com.therapie.interview.customers.model
 
-data class Customer(val id: String)
+data class Customer(val customerId: String)

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.therapie.interview.clinical_services.model.ClinicalService
 import com.therapie.interview.clinical_services.service.remote.ClinicalServicesRestClient
 import com.therapie.interview.clinics.model.Clinic
-import com.therapie.interview.clinics.model.TimeAvailability
+import com.therapie.interview.clinics.model.TimeSlot
 import com.therapie.interview.clinics.service.remote.ClinicRestClient
 import com.therapie.interview.common.exceptions.TherapieRuntimeException
 import com.therapie.interview.customers.model.Customer
@@ -63,19 +63,19 @@ open class BaseTest {
         mockClinicalServicesTimeSlots(emptyList())
     }
 
-    private fun buildTimeSlots(amount: Int, startTime: LocalTime, sizeInMinutes: Int, intervalInMinutes: Int): List<TimeAvailability> {
+    private fun buildTimeSlots(amount: Int, startTime: LocalTime, sizeInMinutes: Int, intervalInMinutes: Int): List<TimeSlot> {
         var currentTime = startTime
         return (0..amount).map {
-            val time = TimeAvailability(currentTime, currentTime.plusMinutes(sizeInMinutes.toLong()))
+            val time = TimeSlot(currentTime, currentTime.plusMinutes(sizeInMinutes.toLong()))
             currentTime = currentTime.plusMinutes(sizeInMinutes.toLong() + intervalInMinutes.toLong())
             time
         }
     }
 
-    private fun buildInvalidTimeSlots(amount: Int, startTime: LocalTime, sizeInMinutes: Int, intervalInMinutes: Int): List<TimeAvailability> {
+    private fun buildInvalidTimeSlots(amount: Int, startTime: LocalTime, sizeInMinutes: Int, intervalInMinutes: Int): List<TimeSlot> {
         var currentTime = startTime
         return (0..amount).map {
-            val time = TimeAvailability( currentTime.plusMinutes(sizeInMinutes.toLong()),currentTime)
+            val time = TimeSlot( currentTime.plusMinutes(sizeInMinutes.toLong()),currentTime)
             currentTime = currentTime.plusMinutes(sizeInMinutes.toLong() + intervalInMinutes.toLong())
             time
         }
@@ -102,7 +102,7 @@ open class BaseTest {
         mockClinicalServices(clinicalService)
     }
 
-    protected fun mockClinicalServicesTimeSlots(listOf: List<TimeAvailability>) {
+    protected fun mockClinicalServicesTimeSlots(listOf: List<TimeSlot>) {
         `when`(clinicRestClient.retrieveTimeSlots(anyString(), anyString(), anyString(), anyString())).thenReturn(listOf)
     }
 

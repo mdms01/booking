@@ -1,0 +1,921 @@
+{
+	"info": {
+		"_postman_id": "e9e94934-cb31-48d5-98da-423b1769089f",
+		"name": "Booking Examples",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get clinics",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm/clinics",
+					"protocol": "https",
+					"host": [
+						"ceh87pf9m7",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"santosm",
+						"clinics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get customers",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "",
+					"protocol": "https",
+					"host": [
+						"ceh87pf9m7",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"santosm",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get time slots",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"url": {
+					"raw": "",
+					"protocol": "https",
+					"host": [
+						"ceh87pf9m7",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"santosm",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Services",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"url": {
+					"raw": "https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm/services",
+					"protocol": "https",
+					"host": [
+						"ceh87pf9m7",
+						"execute-api",
+						"eu-west-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"santosm",
+						"services"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get bookings for a clinic",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9000/api/clinics/clinic100/bookings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"api",
+						"clinics",
+						"clinic100",
+						"bookings"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get clinics",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm/clinics",
+							"protocol": "https",
+							"host": [
+								"ceh87pf9m7",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"santosm",
+								"clinics"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "541"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 02 Mar 2021 21:11:27 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "62ed325a-8d3f-40d1-8581-bb2c010f7f29"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "bk9_4GTsjoEFyPg="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-603ea9ff-2137f99221f99c496924ea00;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 95f372def48b268a5ae55a9a5ecb4479.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "DUB2-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "5hOPtVavQXlhe31YyjG7wILW9FOogsOCiKGCdF5art8jvWeaM69Kzw=="
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"clinicId\": \"clinic100\",\n        \"city\": \"London\",\n        \"country\": \"United Kingdom\",\n        \"streetAddress\": \"56, Haughton Rd\"\n    },\n    {\n        \"clinicId\": \"clinic102\",\n        \"city\": \"Belfast\",\n        \"country\": \"Northern Ireland\",\n        \"streetAddress\": \"36-40 Ann Street\"\n    },\n    {\n        \"clinicId\": \"clinic103\",\n        \"city\": \"Dublin\",\n        \"country\": \"Ireland\",\n        \"streetAddress\": \"Main St, Malahide (opposite the Garda station)\"\n    },\n    {\n        \"clinicId\": \"clinic104\",\n        \"city\": \"Waterford\",\n        \"country\": \"Ireland\",\n        \"streetAddress\": \"31 Barronstrand Street\"\n    },\n    {\n        \"clinicId\": \"clinic105\",\n        \"city\": \"Dublin\",\n        \"country\": \"Ireland\",\n        \"streetAddress\": \"40 O’Connell Street\"\n    }\n]"
+				},
+				{
+					"name": "Get Services",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"type": "text",
+								"value": ""
+							}
+						],
+						"url": {
+							"raw": "https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm/services",
+							"protocol": "https",
+							"host": [
+								"ceh87pf9m7",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"santosm",
+								"services"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "417"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 02 Mar 2021 21:16:22 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "342524ec-9d07-4d21-b0fc-625b7e006d6d"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "bk-uBEeojoEFibg="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-603eab26-7ec8ac8b01505d5b44114714;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 95f372def48b268a5ae55a9a5ecb4479.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "DUB2-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "jH7QyjHRmGZdfqmtmZiZBEzbuNFv3petZ4IyAPgNd-zRRuYhUSD79A=="
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"serviceId\": \"ser100\",\n        \"name\": \"Blow dry\",\n        \"price\": 25.5,\n        \"durationInMinutes\": 30\n    },\n    {\n        \"serviceId\": \"ser101\",\n        \"name\": \"Hydrafacial Skin Health\",\n        \"price\": 150,\n        \"durationInMinutes\": 60\n    },\n    {\n        \"serviceId\": \"ser102\",\n        \"name\": \"Derma Pen\",\n        \"price\": 200,\n        \"durationInMinutes\": 150\n    },\n    {\n        \"serviceId\": \"ser103\",\n        \"name\": \"JetPeel 3V\",\n        \"price\": 150,\n        \"durationInMinutes\": 45\n    },\n    {\n        \"serviceId\": \"ser104\",\n        \"name\": \"Obagi Blue Radiance Peel\",\n        \"price\": 120,\n        \"durationInMinutes\": 30\n    }\n]"
+				},
+				{
+					"name": "Get customers",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "",
+							"protocol": "https",
+							"host": [
+								"ceh87pf9m7",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"santosm",
+								"customers"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "416"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 02 Mar 2021 21:14:45 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "25578512-7949-45f9-b0d1-4bb872a5fa53"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "bk-e2Ey2DoEFQ3w="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-603eaac5-406f5fa67da81694498799f6;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 95f372def48b268a5ae55a9a5ecb4479.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "DUB2-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "Yl-iTKUQeAncRf8YtupLa4mn5IH-9u9dwPdQEIqExoDzoWClSIJftg=="
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"customerId\": \"ab123\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"mobile\": 871229345\n    },\n    {\n        \"customerId\": \"cd123\",\n        \"firstName\": \"Mister\",\n        \"lastName\": \"Fantastic\",\n        \"mobile\": 891229346\n    },\n    {\n        \"customerId\": \"ef123\",\n        \"firstName\": \"Rocket\",\n        \"lastName\": \"Raccoon\",\n        \"mobile\": 901229347\n    },\n    {\n        \"customerId\": \"gh123\",\n        \"firstName\": \"Silver\",\n        \"lastName\": \"Surfer\",\n        \"mobile\": 911229348\n    },\n    {\n        \"customerId\": \"ij123\",\n        \"firstName\": \"Loki\",\n        \"lastName\": \"Laufeyson\",\n        \"mobile\": 921229349\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get free agenda",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9000/api/bookings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"bookings"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get customers",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "",
+							"protocol": "https",
+							"host": [
+								"ceh87pf9m7",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"santosm",
+								"customers"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "416"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 02 Mar 2021 21:14:45 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "25578512-7949-45f9-b0d1-4bb872a5fa53"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "bk-e2Ey2DoEFQ3w="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-603eaac5-406f5fa67da81694498799f6;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 95f372def48b268a5ae55a9a5ecb4479.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "DUB2-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "Yl-iTKUQeAncRf8YtupLa4mn5IH-9u9dwPdQEIqExoDzoWClSIJftg=="
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"customerId\": \"ab123\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"mobile\": 871229345\n    },\n    {\n        \"customerId\": \"cd123\",\n        \"firstName\": \"Mister\",\n        \"lastName\": \"Fantastic\",\n        \"mobile\": 891229346\n    },\n    {\n        \"customerId\": \"ef123\",\n        \"firstName\": \"Rocket\",\n        \"lastName\": \"Raccoon\",\n        \"mobile\": 901229347\n    },\n    {\n        \"customerId\": \"gh123\",\n        \"firstName\": \"Silver\",\n        \"lastName\": \"Surfer\",\n        \"mobile\": 911229348\n    },\n    {\n        \"customerId\": \"ij123\",\n        \"firstName\": \"Loki\",\n        \"lastName\": \"Laufeyson\",\n        \"mobile\": 921229349\n    }\n]"
+				},
+				{
+					"name": "Get Services",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"type": "text",
+								"value": ""
+							}
+						],
+						"url": {
+							"raw": "https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm/services",
+							"protocol": "https",
+							"host": [
+								"ceh87pf9m7",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"santosm",
+								"services"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "417"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 02 Mar 2021 21:16:22 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "342524ec-9d07-4d21-b0fc-625b7e006d6d"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "bk-uBEeojoEFibg="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-603eab26-7ec8ac8b01505d5b44114714;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 95f372def48b268a5ae55a9a5ecb4479.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "DUB2-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "jH7QyjHRmGZdfqmtmZiZBEzbuNFv3petZ4IyAPgNd-zRRuYhUSD79A=="
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"serviceId\": \"ser100\",\n        \"name\": \"Blow dry\",\n        \"price\": 25.5,\n        \"durationInMinutes\": 30\n    },\n    {\n        \"serviceId\": \"ser101\",\n        \"name\": \"Hydrafacial Skin Health\",\n        \"price\": 150,\n        \"durationInMinutes\": 60\n    },\n    {\n        \"serviceId\": \"ser102\",\n        \"name\": \"Derma Pen\",\n        \"price\": 200,\n        \"durationInMinutes\": 150\n    },\n    {\n        \"serviceId\": \"ser103\",\n        \"name\": \"JetPeel 3V\",\n        \"price\": 150,\n        \"durationInMinutes\": 45\n    },\n    {\n        \"serviceId\": \"ser104\",\n        \"name\": \"Obagi Blue Radiance Peel\",\n        \"price\": 120,\n        \"durationInMinutes\": 30\n    }\n]"
+				},
+				{
+					"name": "Get clinics",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm/clinics",
+							"protocol": "https",
+							"host": [
+								"ceh87pf9m7",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"santosm",
+								"clinics"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "541"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 02 Mar 2021 21:11:27 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "62ed325a-8d3f-40d1-8581-bb2c010f7f29"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "bk9_4GTsjoEFyPg="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-603ea9ff-2137f99221f99c496924ea00;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 95f372def48b268a5ae55a9a5ecb4479.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "DUB2-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "5hOPtVavQXlhe31YyjG7wILW9FOogsOCiKGCdF5art8jvWeaM69Kzw=="
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"clinicId\": \"clinic100\",\n        \"city\": \"London\",\n        \"country\": \"United Kingdom\",\n        \"streetAddress\": \"56, Haughton Rd\"\n    },\n    {\n        \"clinicId\": \"clinic102\",\n        \"city\": \"Belfast\",\n        \"country\": \"Northern Ireland\",\n        \"streetAddress\": \"36-40 Ann Street\"\n    },\n    {\n        \"clinicId\": \"clinic103\",\n        \"city\": \"Dublin\",\n        \"country\": \"Ireland\",\n        \"streetAddress\": \"Main St, Malahide (opposite the Garda station)\"\n    },\n    {\n        \"clinicId\": \"clinic104\",\n        \"city\": \"Waterford\",\n        \"country\": \"Ireland\",\n        \"streetAddress\": \"31 Barronstrand Street\"\n    },\n    {\n        \"clinicId\": \"clinic105\",\n        \"city\": \"Dublin\",\n        \"country\": \"Ireland\",\n        \"streetAddress\": \"40 O’Connell Street\"\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Post bookings",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"clinicId\": \"clinic100\",\n\"customerId\": \"ab123\",\n\"serviceId\": \"ser100\",\n\"date\": \"2021-01-25\",\n\"startTime\": \"T10:30:00\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9000/bookings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"bookings"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get Services",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"type": "text",
+								"value": ""
+							}
+						],
+						"url": {
+							"raw": "https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm/services",
+							"protocol": "https",
+							"host": [
+								"ceh87pf9m7",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"santosm",
+								"services"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "417"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 02 Mar 2021 21:16:22 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "342524ec-9d07-4d21-b0fc-625b7e006d6d"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "bk-uBEeojoEFibg="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-603eab26-7ec8ac8b01505d5b44114714;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 95f372def48b268a5ae55a9a5ecb4479.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "DUB2-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "jH7QyjHRmGZdfqmtmZiZBEzbuNFv3petZ4IyAPgNd-zRRuYhUSD79A=="
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"serviceId\": \"ser100\",\n        \"name\": \"Blow dry\",\n        \"price\": 25.5,\n        \"durationInMinutes\": 30\n    },\n    {\n        \"serviceId\": \"ser101\",\n        \"name\": \"Hydrafacial Skin Health\",\n        \"price\": 150,\n        \"durationInMinutes\": 60\n    },\n    {\n        \"serviceId\": \"ser102\",\n        \"name\": \"Derma Pen\",\n        \"price\": 200,\n        \"durationInMinutes\": 150\n    },\n    {\n        \"serviceId\": \"ser103\",\n        \"name\": \"JetPeel 3V\",\n        \"price\": 150,\n        \"durationInMinutes\": 45\n    },\n    {\n        \"serviceId\": \"ser104\",\n        \"name\": \"Obagi Blue Radiance Peel\",\n        \"price\": 120,\n        \"durationInMinutes\": 30\n    }\n]"
+				},
+				{
+					"name": "Get customers",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "",
+							"protocol": "https",
+							"host": [
+								"ceh87pf9m7",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"santosm",
+								"customers"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "416"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 02 Mar 2021 21:14:45 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "25578512-7949-45f9-b0d1-4bb872a5fa53"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "bk-e2Ey2DoEFQ3w="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-603eaac5-406f5fa67da81694498799f6;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 95f372def48b268a5ae55a9a5ecb4479.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "DUB2-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "Yl-iTKUQeAncRf8YtupLa4mn5IH-9u9dwPdQEIqExoDzoWClSIJftg=="
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"customerId\": \"ab123\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"mobile\": 871229345\n    },\n    {\n        \"customerId\": \"cd123\",\n        \"firstName\": \"Mister\",\n        \"lastName\": \"Fantastic\",\n        \"mobile\": 891229346\n    },\n    {\n        \"customerId\": \"ef123\",\n        \"firstName\": \"Rocket\",\n        \"lastName\": \"Raccoon\",\n        \"mobile\": 901229347\n    },\n    {\n        \"customerId\": \"gh123\",\n        \"firstName\": \"Silver\",\n        \"lastName\": \"Surfer\",\n        \"mobile\": 911229348\n    },\n    {\n        \"customerId\": \"ij123\",\n        \"firstName\": \"Loki\",\n        \"lastName\": \"Laufeyson\",\n        \"mobile\": 921229349\n    }\n]"
+				},
+				{
+					"name": "Get clinics",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://ceh87pf9m7.execute-api.eu-west-1.amazonaws.com/santosm/clinics",
+							"protocol": "https",
+							"host": [
+								"ceh87pf9m7",
+								"execute-api",
+								"eu-west-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"santosm",
+								"clinics"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "541"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 02 Mar 2021 21:11:27 GMT"
+						},
+						{
+							"key": "x-amzn-RequestId",
+							"value": "62ed325a-8d3f-40d1-8581-bb2c010f7f29"
+						},
+						{
+							"key": "x-amz-apigw-id",
+							"value": "bk9_4GTsjoEFyPg="
+						},
+						{
+							"key": "X-Amzn-Trace-Id",
+							"value": "Root=1-603ea9ff-2137f99221f99c496924ea00;Sampled=0"
+						},
+						{
+							"key": "X-Cache",
+							"value": "Miss from cloudfront"
+						},
+						{
+							"key": "Via",
+							"value": "1.1 95f372def48b268a5ae55a9a5ecb4479.cloudfront.net (CloudFront)"
+						},
+						{
+							"key": "X-Amz-Cf-Pop",
+							"value": "DUB2-C1"
+						},
+						{
+							"key": "X-Amz-Cf-Id",
+							"value": "5hOPtVavQXlhe31YyjG7wILW9FOogsOCiKGCdF5art8jvWeaM69Kzw=="
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"clinicId\": \"clinic100\",\n        \"city\": \"London\",\n        \"country\": \"United Kingdom\",\n        \"streetAddress\": \"56, Haughton Rd\"\n    },\n    {\n        \"clinicId\": \"clinic102\",\n        \"city\": \"Belfast\",\n        \"country\": \"Northern Ireland\",\n        \"streetAddress\": \"36-40 Ann Street\"\n    },\n    {\n        \"clinicId\": \"clinic103\",\n        \"city\": \"Dublin\",\n        \"country\": \"Ireland\",\n        \"streetAddress\": \"Main St, Malahide (opposite the Garda station)\"\n    },\n    {\n        \"clinicId\": \"clinic104\",\n        \"city\": \"Waterford\",\n        \"country\": \"Ireland\",\n        \"streetAddress\": \"31 Barronstrand Street\"\n    },\n    {\n        \"clinicId\": \"clinic105\",\n        \"city\": \"Dublin\",\n        \"country\": \"Ireland\",\n        \"streetAddress\": \"40 O’Connell Street\"\n    }\n]"
+				}
+			]
+		}
+	]
+}

@@ -1,8 +1,8 @@
 package com.therapie.interview.clinics.service
 
 
-import com.therapie.interview.clinics.model.TimeAvailability
 import com.therapie.interview.clinics.model.TimeSlot
+import com.therapie.interview.clinics.model.ClinicalServiceTimeSlot
 import mu.KLogging
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
@@ -19,23 +19,23 @@ class ClinicServiceBusinessWrapper(@Qualifier("clinicServiceRest") val wrapped: 
             wrapped.retrieveClinicById(clinicId)
 
 
-    override fun retrieveTimeAvailabilitiesForTimeSlot(clinicId: String, serviceId: String, date: LocalDate, serviceDurationInMinutes: Long): List<TimeAvailability> {
+    override fun retrieveTimeAvailabilitiesForTimeSlot(clinicId: String, serviceId: String, date: LocalDate, serviceDurationInMinutes: Long): List<TimeSlot> {
         val timeAvailability = wrapped.retrieveTimeAvailabilitiesForTimeSlot(clinicId, serviceId, date, serviceDurationInMinutes)
         val timeAvailabilityLogic = TimeAvailabilityLogic(clinicId, serviceId, date, serviceDurationInMinutes)
         return timeAvailabilityLogic.validateTimeAvailability(timeAvailability)
     }
 
-    override fun checkTimeSlotIsValid(timeSlot: TimeSlot) {
-        val clinicId = timeSlot.clinicId
-        val serviceId = timeSlot.serviceId
-        val date = timeSlot.date
-        val serviceDurationInMinutes = timeSlot.durationInMinutes
+    override fun checkTimeSlotIsValid(clinicalServiceTimeSlot: ClinicalServiceTimeSlot) {
+        val clinicId = clinicalServiceTimeSlot.clinicId
+        val serviceId = clinicalServiceTimeSlot.serviceId
+        val date = clinicalServiceTimeSlot.date
+        val serviceDurationInMinutes = clinicalServiceTimeSlot.durationInMinutes
 
         val timeAvailabilities = retrieveTimeAvailabilitiesForTimeSlot(clinicId, serviceId, date, serviceDurationInMinutes)
 
         val timeAvailabilityLogic = TimeAvailabilityLogic(clinicId, serviceId, date, serviceDurationInMinutes)
 
-        timeAvailabilityLogic.assertTimeSlotFitsInOneOfTimeAvailabilities(timeSlot, timeAvailabilities)
+        timeAvailabilityLogic.assertTimeSlotFitsInOneOfTimeAvailabilities(clinicalServiceTimeSlot, timeAvailabilities)
     }
 
     override fun retrieveBookableTimeSlots(clinicId: String, serviceId: String, date: LocalDate, serviceDurationInMinutes: Long): List<LocalTime> {

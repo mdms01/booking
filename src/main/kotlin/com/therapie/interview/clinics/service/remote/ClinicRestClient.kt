@@ -1,7 +1,7 @@
 package com.therapie.interview.clinics.service.remote
 
 import com.therapie.interview.clinics.model.Clinic
-import com.therapie.interview.clinics.model.TimeAvailability
+import com.therapie.interview.clinics.model.TimeSlot
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.validation.annotation.Validated
@@ -25,6 +25,6 @@ interface ClinicRestClient {
     fun retrieveTimeSlots(@PathVariable("clinicId") clinicId: String,
                           @PathVariable("serviceId") serviceId: String,
                           @PathVariable("date") date: String,
-                          @RequestHeader("x-api-key") apikey: String): List<TimeAvailability>
+                          @RequestHeader("x-api-key") apikey: String): List<TimeSlot>
 
 }

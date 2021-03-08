@@ -1,8 +1,8 @@
 package com.therapie.interview.clinics.service
 
 import com.therapie.interview.clinics.exception.TimeSlotException
-import com.therapie.interview.clinics.model.TimeAvailability
 import com.therapie.interview.clinics.model.TimeSlot
+import com.therapie.interview.clinics.model.ClinicalServiceTimeSlot
 import mu.KLogging
 import java.io.InvalidObjectException
 import java.time.LocalDate
@@ -16,43 +16,43 @@ class TimeAvailabilityLogic (val clinicId: String, val serviceId: String, val da
 
 
 
-    fun assertTimeSlotFitsInOneOfTimeAvailabilities(timeSlot: TimeSlot, serviceShifts: List<TimeAvailability>) {
-        assertThereAreSlots(serviceShifts, timeSlot)
-        val shift = getShiftWhereTimeSlotFits(serviceShifts, timeSlot)
-        assertTimeSlotFitsInShift(timeSlot, shift)
+    fun assertTimeSlotFitsInOneOfTimeAvailabilities(clinicalServiceTimeSlot: ClinicalServiceTimeSlot, serviceShifts: List<TimeSlot>) {
+        assertThereAreSlots(serviceShifts, clinicalServiceTimeSlot)
+        val shift = getShiftWhereTimeSlotFits(serviceShifts, clinicalServiceTimeSlot)
+        assertTimeSlotFitsInShift(clinicalServiceTimeSlot, shift)
     }
 
-    fun generateBookableTimeSlots(timeSlots: List<TimeAvailability>) =
+    fun generateBookableTimeSlots(timeSlots: List<TimeSlot>) =
             timeSlots.flatMap { generateBookableTimeSlotsForTimeRange(it) }
 
-    private fun getShiftWhereTimeSlotFits(serviceShifts: List<TimeAvailability>, timeSlot: TimeSlot): TimeAvailability {
-        val endTime = timeSlot.getEndTime()
-        return serviceShifts.firstOrNull { it.startTime <= timeSlot.startTime && it.endTime >= endTime }
-                ?: throw TimeSlotException("error.time_slot.no_match", "There is no available slots for date ${timeSlot.date} between ${timeSlot.startTime} and $endTime",
-                        mapOf<String, Any>("date" to timeSlot.date, "startTime" to timeSlot.startTime, "endTime" to endTime))
+    private fun getShiftWhereTimeSlotFits(serviceShifts: List<TimeSlot>, clinicalServiceTimeSlot: ClinicalServiceTimeSlot): TimeSlot {
+        val endTime = clinicalServiceTimeSlot.getEndTime()
+        return serviceShifts.firstOrNull { it.startTime <= clinicalServiceTimeSlot.startTime && it.endTime >= endTime }
+                ?: throw TimeSlotException("error.time_slot.no_match", "There is no available slots for date ${clinicalServiceTimeSlot.date} between ${clinicalServiceTimeSlot.startTime} and $endTime",
+                        mapOf<String, Any>("date" to clinicalServiceTimeSlot.date, "startTime" to clinicalServiceTimeSlot.startTime, "endTime" to endTime))
     }
 
-    private fun assertTimeSlotFitsInShift(timeSlot: TimeSlot, timeAvailability: TimeAvailability) {
-        val serviceDurationInSeconds = timeSlot.durationInMinutes * SIXTY_SECONDS
-        val timeDifferenceInSeconds = (timeSlot.startTime - timeAvailability.startTime).toSecondOfDay()
+    private fun assertTimeSlotFitsInShift(clinicalServiceTimeSlot: ClinicalServiceTimeSlot, timeSlot: TimeSlot) {
+        val serviceDurationInSeconds = clinicalServiceTimeSlot.durationInMinutes * SIXTY_SECONDS
+        val timeDifferenceInSeconds = (clinicalServiceTimeSlot.startTime - timeSlot.startTime).toSecondOfDay()
 
         if (!isTimeSlotFit(timeDifferenceInSeconds, serviceDurationInSeconds)) {
-            throw TimeSlotException("error.time_slot.wrong_start_time", "There is no option to book the service at ${timeSlot.startTime}")
+            throw TimeSlotException("error.time_slot.wrong_start_time", "There is no option to book the service at ${clinicalServiceTimeSlot.startTime}")
         }
     }
 
     private fun isTimeSlotFit(timeDifferenceInSeconds: Int, serviceDurationInSeconds: Long) =
             (timeDifferenceInSeconds % serviceDurationInSeconds) == 0L
 
-    private fun assertThereAreSlots(retrieveTimeSlots: List<TimeAvailability>, timeSlot: TimeSlot) {
+    private fun assertThereAreSlots(retrieveTimeSlots: List<TimeSlot>, clinicalServiceTimeSlot: ClinicalServiceTimeSlot) {
         if (retrieveTimeSlots.isEmpty()) {
-            throw TimeSlotException("error.time_slot.no_available", "There is no available slots for date ${timeSlot.date}",
-                    mapOf("date" to timeSlot.date))
+            throw TimeSlotException("error.time_slot.no_available", "There is no available slots for date ${clinicalServiceTimeSlot.date}",
+                    mapOf("date" to clinicalServiceTimeSlot.date))
         }
     }
 
 
-    private fun generateBookableTimeSlotsForTimeRange(timeSlots: TimeAvailability): List<LocalTime> {
+    private fun generateBookableTimeSlotsForTimeRange(timeSlots: TimeSlot): List<LocalTime> {
         var startTime = timeSlots.startTime
         val bookableTimeSlots = mutableListOf<LocalTime>()
         while (startTime.plusMinutes(serviceDurationInMinutes) <= timeSlots.endTime) {
@@ -65,9 +65,9 @@ class TimeAvailabilityLogic (val clinicId: String, val serviceId: String, val da
     operator fun LocalTime.minus(startTime: LocalTime): LocalTime =
             LocalTime.ofNanoOfDay(this.toNanoOfDay() - startTime.toNanoOfDay())
 
-    fun validateTimeAvailability(timeAvailabilities: List<TimeAvailability>): List<TimeAvailability> {
+    fun validateTimeAvailability(timeSlots: List<TimeSlot>): List<TimeSlot> {
         val serviceDurationInSeconds = serviceDurationInMinutes * SIXTY_SECONDS
-        return assertNoTimeOverlap(timeAvailabilities.onEach {
+        return assertNoTimeOverlap(timeSlots.onEach {
             if (!it.isValid()) {
                 throw InvalidObjectException("Time range from for clinic $clinicId and service $serviceId at $date is invalid: $it")
             }
@@ -80,9 +80,9 @@ class TimeAvailabilityLogic (val clinicId: String, val serviceId: String, val da
         }
         )
     }
-    private fun assertNoTimeOverlap(timeAvailabilities: List<TimeAvailability>): List<TimeAvailability> {
-        if (timeAvailabilities.isNotEmpty()) {
-            val sortedAvailabilities = timeAvailabilities.sortedBy { it.startTime }
+    private fun assertNoTimeOverlap(timeSlots: List<TimeSlot>): List<TimeSlot> {
+        if (timeSlots.isNotEmpty()) {
+            val sortedAvailabilities = timeSlots.sortedBy { it.startTime }
             var previousAvailability = sortedAvailabilities.first()
             var endTime = previousAvailability.startTime
             sortedAvailabilities.forEach {
@@ -94,7 +94,7 @@ class TimeAvailabilityLogic (val clinicId: String, val serviceId: String, val da
             }
         }
 
-        return timeAvailabilities
+        return timeSlots
     }
 
 

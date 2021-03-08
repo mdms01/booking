@@ -1,17 +1,19 @@
 package com.therapie.interview.booking.service
 
+import com.therapie.interview.booking.exception.BookingException
 import com.therapie.interview.booking.model.dto.Booking
 import com.therapie.interview.booking.model.dto.BookingRequest
 import com.therapie.interview.booking.model.entity.BookingEntity
 import com.therapie.interview.booking.repository.BookingRepository
 import com.therapie.interview.clinical_services.service.ClinicalServiceTypeService
-import com.therapie.interview.clinics.model.TimeSlot
+import com.therapie.interview.clinics.model.ClinicalServiceTimeSlot
 import com.therapie.interview.clinics.service.ClinicService
 import com.therapie.interview.customers.service.CustomerService
 import mu.KLogging
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 @Service
@@ -48,11 +50,20 @@ class BookingServiceImpl(
     }
 
     private fun validateBookingRequest(bookingRequest: BookingRequest) {
+        checkIfBookingIsInTheFuture(bookingRequest)
         checkClinic(bookingRequest.clinicId)
         checkCustomer(bookingRequest)
         val clinicalServiceType = clinicalServiceTypeService.retrieveById(bookingRequest.serviceId)
         val timeSlot = bookingRequest.toTimeSlot(clinicalServiceType.durationInMinutes)
         clinicService.checkTimeSlotIsValid(timeSlot)
+    }
+
+    private fun checkIfBookingIsInTheFuture(bookingRequest: BookingRequest) {
+        val now = LocalDateTime.now()
+        val booking = bookingRequest.date.atTime(bookingRequest.startTime)
+        if (now.isAfter(booking)) {
+            throw BookingException("error.booking.not_past_booking", "Bookings can't happen in the past", mapOf("currentTime" to now))
+        }
     }
 
     private fun checkCustomer(bookingRequest: BookingRequest) {
@@ -69,8 +80,8 @@ class BookingServiceImpl(
 
 }
 
-private fun BookingRequest.toTimeSlot(durationInMinutes: Long): TimeSlot =
-        TimeSlot(clinicId, serviceId, date, startTime, durationInMinutes)
+private fun BookingRequest.toTimeSlot(durationInMinutes: Long): ClinicalServiceTimeSlot =
+        ClinicalServiceTimeSlot(clinicId, serviceId, date, startTime, durationInMinutes)
 
 private fun BookingRequest.toEntity(): BookingEntity =
         BookingEntity(clinicId, serviceId, date, startTime, customerId)
